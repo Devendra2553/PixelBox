@@ -65,8 +65,6 @@ const Order = () => {
       await axios.put(`http://localhost:5000/api/orders/${orderId}`, {
         orderStatus: newStatus,
       });
-
-      // Update local state to reflect the change immediately
       setOrders(
         orders.map((order) =>
           order._id === orderId ? { ...order, orderStatus: newStatus } : order
@@ -123,52 +121,39 @@ const Order = () => {
               </div>
 
               {/* Custom Styled Dropdown */}
-              <div className="relative z-10">
-                <div className="flex items-center px-3 py-1.5 gap-2">
-                  <span className="font-semibold text-md">Status: </span>
-                  <div className="relative">
-                    <select
-                      value={order.orderStatus}
-                      onChange={(e) =>
-                        handleStatusChange(order._id, e.target.value)
-                      }
-                      className="p-2 bg-gray-200 rounded-lg outline-none font-semibold transition mr-1 cursor-pointer"
-                    >
-                      <option className="bg-white" value="placed">Placed</option>
-                      <option className="bg-white" value="shipped">Shipped</option>
-                      <option className="bg-white" value="delivered">Delivered</option>
-                    </select>
+<div className="relative z-10">
+  <div className="flex items-center px-3 py-1.5 gap-2">
+    <span className="font-semibold text-md">Status: </span>
+    <div className="relative">
+      <select
+        value={order.orderStatus}
+        onChange={(e) => handleStatusChange(order._id, e.target.value)}
+        // LOCK: Disable if status is delivered OR cancelled
+        disabled={order.orderStatus === "delivered"}
+        className={`p-2 rounded-lg outline-none font-semibold transition mr-1 
+          ${(order.orderStatus === "delivered") 
+            ? "bg-gray-100 text-gray-500 cursor-not-allowed" 
+            : "bg-gray-200 cursor-pointer"}`}
+      >
+        <option value="placed">Placed</option>
+        <option value="shipped">Shipped</option>
+        <option value="delivered">Delivered</option>
+      </select>
+    </div>
 
-                    {openDropdownId === order._id && (
-                      <div className="absolute top-full right-0 mt-2 w-36 bg-white text-black rounded-xl shadow-xl p-2 space-y-1 border border-gray-100 ring-1 ring-black/5 z-50">
-                        {statusOptions.map((status) => (
-                          <button
-                            key={status}
-                            onClick={() =>
-                              handleStatusChange(order._id, status)
-                            }
-                            className={`block w-full text-left px-3 py-2 rounded-lg text-sm capitalize transition ${
-                              order.orderStatus === status
-                                ? "bg-gray-100 font-bold"
-                                : "hover:bg-gray-100"
-                            }`}
-                          >
-                            {status}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <div key={order._id}>
-                    <button
-                      onClick={() => orderCancle(order)}
-                      className="bg-red-500 text-white font-semibold px-2 py-1 rounded-md border-0 hover:bg-red-600 cursor-pointer"
-                    >
-                      Cancel Order
-                    </button>
-                  </div>
-                </div>
-              </div>
+    {/* REMOVE: Hide cancel button if status is delivered OR cancelled */}
+    {order.orderStatus !== "delivered" && (
+      <div>
+        <button
+          onClick={() => orderCancle(order)}
+          className="bg-red-500 text-white font-semibold px-2 py-1 rounded-md border-0 hover:bg-red-600 cursor-pointer"
+        >
+          Cancel Order
+        </button>
+      </div>
+    )}
+  </div>
+</div>
             </div>
 
             <div className="mt-2 pt-4 border-t border-gray-300 grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl">

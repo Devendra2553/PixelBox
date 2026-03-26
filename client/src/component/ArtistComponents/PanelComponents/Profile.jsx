@@ -8,11 +8,8 @@ const Profile = () => {
     phone: "",
     email: "",
     address: "",
-    profileImage: ""
+    password: ""
   });
-  
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [preview, setPreview] = useState("");
 
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const userId = storedUser?._id;
@@ -24,10 +21,11 @@ const Profile = () => {
         const currentUser = res.data.find(u => u._id === userId);
         
         if (currentUser) {
-          setFormData(currentUser);
-          if (currentUser.profileImage) {
-            setPreview(`http://localhost:5000/${currentUser.profileImage}`);
-          }
+          // Initialize form with existing data, excluding password for security
+          setFormData({
+            ...currentUser,
+            password: "" 
+          });
         }
       } catch (err) {
         console.error("Error fetching user data:", err);
@@ -41,46 +39,24 @@ const Profile = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle local file selection and preview
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-      setPreview(URL.createObjectURL(file)); // Create a local URL for the preview
-    }
-  };
-
-  const handlePhotoUpload = async () => {
-    if (!selectedFile) return;
-  
-    const uploadData = new FormData();
-    uploadData.append("profileImage", selectedFile);
-  
-    try {
-      const res = await userBaseUrl.patch(`/${userId}/photo`, uploadData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      
-      if (res.status === 200) {
-        const updatedUser = { ...storedUser, profileImage: res.data.profileImage };
-        localStorage.setItem("user", JSON.stringify(updatedUser));
-        setSelectedFile(null);
-        alert("Profile photo updated!");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Failed to upload photo");
-    }
-  };
-
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      const res = await userBaseUrl.patch(`/${userId}`, formData);
+      // Create a copy of data to send
+      const updatePayload = { ...formData };
+      
+      // If password field is empty, don't send it to avoid overwriting with empty string
+      if (!updatePayload.password) {
+        delete updatePayload.password;
+      }
+
+      const res = await userBaseUrl.patch(`/${userId}`, updatePayload);
       if (res.status === 200) {
         const updatedUser = { ...storedUser, ...res.data };
         localStorage.setItem("user", JSON.stringify(updatedUser));
         alert("Profile updated successfully!");
+        // Clear password field after successful update
+        setFormData(prev => ({ ...prev, password: "" }));
       }
     } catch (err) {
       console.error(err);
@@ -88,55 +64,12 @@ const Profile = () => {
     }
   };
 
-  const defaultPhoto = `https://ui-avatars.com/api/?name=${formData.firstName}+${formData.lastName}&background=ff751f&color=fff&size=200`;
-
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white shadow-md hover:shadow-xl transition rounded-2xl">
       <h2 className="text-2xl font-semibold mb-6">Profile Settings</h2>
 
-      {/* Profile Photo Section */}
-      <div className="flex flex-col items-center gap-4 mb-8">
-        <div className="relative group cursor-pointer">
-          <img
-            src={preview || defaultPhoto}
-            className="w-40 h-40 rounded-full object-cover border-4 border-[#ff751f]/20 shadow-sm transition group-hover:brightness-75"
-            alt="Artist Profile"
-          />
-          {/* Overlay to trigger file input */}
-          <label className="absolute inset-0 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 font-semibold transition">
-            Change Photo
-            <input 
-              type="file" 
-              className="hidden" 
-              accept="image/*" 
-              onChange={handleFileChange}
-            />
-          </label>
-        </div>
-
-        {/* Show Confirm button only when a new file is picked */}
-        {selectedFile && (
-          <div className="flex gap-2">
-            <button 
-              onClick={handlePhotoUpload}
-              className="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-bold hover:bg-green-600 transition"
-            >
-              Confirm Upload
-            </button>
-            <button 
-              onClick={() => {
-                setSelectedFile(null);
-                setPreview(formData.profileImage ? `http://localhost:5000/${formData.profileImage}` : "");
-              }}
-              className="bg-gray-400 text-white px-4 py-1 rounded-full text-sm font-bold hover:bg-gray-500 transition"
-            >
-              Cancel
-            </button>
-          </div>
-        )}
-      </div>
-
       <form onSubmit={handleUpdate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* First Name */}
         <div className="flex flex-col gap-1">
           <label className="text-sm font-semibold text-gray-600 ml-1">First Name</label>
           <input
@@ -149,6 +82,7 @@ const Profile = () => {
           />
         </div>
         
+        {/* Last Name */}
         <div className="flex flex-col gap-1">
           <label className="text-sm font-semibold text-gray-600 ml-1">Last Name</label>
           <input
@@ -161,6 +95,7 @@ const Profile = () => {
           />
         </div>
 
+        {/* Phone Number */}
         <div className="flex flex-col gap-1">
           <label className="text-sm font-semibold text-gray-600 ml-1">Phone Number</label>
           <input
@@ -173,16 +108,34 @@ const Profile = () => {
           />
         </div>
 
+        {/* Email Address - Now Editable */}
         <div className="flex flex-col gap-1">
           <label className="text-sm font-semibold text-gray-600 ml-1">Email Address</label>
           <input
-            className="w-full border p-3 rounded-lg bg-gray-50 border-gray-300 text-gray-500 cursor-not-allowed"
+            className="w-full border p-3 rounded-lg border-[#ff751f] focus:outline-none focus:ring-2 focus:ring-[#ff751f]/30"
             name="email"
+            type="email"
             value={formData.email}
-            disabled
+            onChange={handleChange}
+            placeholder="Email Address"
+            required
           />
         </div>
 
+        {/* Password - New Field */}
+        <div className="flex flex-col gap-1 md:col-span-2">
+          <label className="text-sm font-semibold text-gray-600 ml-1">New Password (leave blank to keep current)</label>
+          <input
+            className="w-full border p-3 rounded-lg border-[#ff751f] focus:outline-none focus:ring-2 focus:ring-[#ff751f]/30"
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="Enter new password"
+          />
+        </div>
+
+        {/* Address */}
         <div className="flex flex-col gap-1 md:col-span-2">
           <label className="text-sm font-semibold text-gray-600 ml-1">Address</label>
           <textarea

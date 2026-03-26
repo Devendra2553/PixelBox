@@ -67,7 +67,7 @@ const Cart = () => {
       });
 
       alert("Order cancelled successfully");
-      fetchUserOrders(); 
+      fetchUserOrders();
     } catch (err) {
       console.error("Cancellation Error:", err);
       alert("Failed to cancel order properly");
@@ -172,6 +172,17 @@ const Cart = () => {
                             {method}
                           </label>
                         ))}
+                      </div>
+
+                      {/* NEW: Delivery Address Section */}
+                      <div className="mt-3 pt-3 border-t border-gray-200">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                          Delivery Address
+                        </p>
+                        <p className="text-sm text-gray-600 italic">
+                          {user?.address ||
+                            "No address provided. Please update your profile."}
+                        </p>
                       </div>
                     </div>
 

@@ -60,11 +60,20 @@ exports.getUsers = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   try {
-    const { firstName, lastName, phone, address } = req.body;
+    // 1. Added email and password to the destructured body
+    const { firstName, lastName, phone, address, email, password } = req.body;
+
+    // 2. Prepare the update object
+    const updateData = { firstName, lastName, phone, address, email };
+
+    // 3. Only add password to the update if it was actually provided
+    if (password && password.trim() !== "") {
+      updateData.password = password;
+    }
 
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
-      { firstName, lastName, phone, address },
+      updateData,
       { new: true, runValidators: true }
     );
 
@@ -72,6 +81,7 @@ exports.updateUser = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // 4. Update artist name in artworks if name changes
     if (firstName || lastName) {
       const fullName = `${updatedUser.firstName} ${updatedUser.lastName}`;
       await Artwork.updateMany(
@@ -86,27 +96,8 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-
-exports.updateProfilePhoto = async (req, res) => {
-  try {
-    if (!req.file) return res.status(400).json({ message: "No file uploaded" });
-
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    if (user.profileImage) {
-      const oldPath = path.join(__dirname, "..", user.profileImage);
-      if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
-    }
-
-    user.profileImage = req.file.path.replace(/\\/g, "/");
-    await user.save();
-
-    res.json({ message: "Photo updated", profileImage: user.profileImage });
-  } catch (error) {
-    res.status(500).json({ message: "Error uploading photo", error: error.message });
-  }
-};
+// Note: You can now delete the exports.updateProfilePhoto function 
+// from your controller file and the corresponding route in user.routes.js
 
 
 exports.deleteUser = async (req, res) => {
