@@ -31,7 +31,7 @@ const Dashboard = () => {
           (o) => o.orderStatus === "placed"
         ).length;
         const deliveredOrders = orders.filter(
-          (o) => o.orderStatus === "delivered"
+          (o) => o.paymentStatus === "paid"
         );
         const totalSold = deliveredOrders.length;
         const revenue = deliveredOrders.reduce(

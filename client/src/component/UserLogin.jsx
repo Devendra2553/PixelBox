@@ -21,7 +21,7 @@ const UserLogin = () => {
 
       localStorage.setItem("user", JSON.stringify(user));
 
-      navigate("/home");
+      navigate("/");
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.message || "Login failed");
@@ -68,7 +68,7 @@ const UserLogin = () => {
             </button>
 
             <Link
-              to="/"
+              to="/userregister"
               className="w-full block text-center bg-white text-[#ff751f] p-3 rounded-lg border border-[#ff751f] hover:bg-[#ff751f] hover:text-white transition"
             >
               Don't have a customer account? Register here.

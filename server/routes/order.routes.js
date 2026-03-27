@@ -8,4 +8,9 @@ router.put("/:orderId", orderController.updateOrder);
 router.get("/artist/:artist_id", orderController.getArtistOrders);
 router.delete("/:id", orderController.deleteOrder);
 
+router.post("/payment/process", orderController.processPayment)
+router.get("/getkey", orderController.getKey)
+router.post("/paymentVerification", orderController.paymentVerification)
+
+    
 module.exports = router;

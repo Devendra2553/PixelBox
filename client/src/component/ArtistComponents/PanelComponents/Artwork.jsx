@@ -83,19 +83,21 @@ const Artwork = () => {
             >
               <div className="relative w-full aspect-4/5 overflow-hidden">
                 <img
-                  src={`${API_BASE_URL}${item.imageUrl}`} 
+                  src={`${API_BASE_URL}${item.imageUrl}`}
                   alt={item.title}
                   className="w-full h-full object-cover"
                 />
 
-                <button
-                  onClick={() => handleDelete(item._id)}
-                  className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition shadow-lg"
-                >
-                  <Trash2 />
-                </button>
+                {!item.isSold && (
+                  <button
+                    onClick={() => handleDelete(item._id)}
+                    className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition shadow-lg"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                )}
                 {item.isSold ? (
-                  <span className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-3 py-1 rounded-full">
+                  <span className="absolute bottom-2 right-2 bg-green-500/80 text-white text-xs px-3 py-1 rounded-full">
                     Sold
                   </span>
                 ) : (

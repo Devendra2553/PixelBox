@@ -9,6 +9,3 @@ router.delete("/:id", userController.deleteUser);
 router.post("/login", userController.loginUser);
 
 module.exports = router;
-
-const multer = require("multer");
-const path = require("path");

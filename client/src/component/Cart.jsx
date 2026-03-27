@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "./Navbar";
-import axios from "axios"; // Ensure axios is installed or use your axiosInstance
+import axios from "axios";
 
 const Cart = () => {
   const [orders, setOrders] = useState([]);
@@ -34,15 +34,8 @@ const Cart = () => {
     }
   };
 
-  const statusPriority = {
-    cancelled: 1,
-    pending: 2,
-    shipped: 3,
-    delivered: 4,
-  };
-
   const sortedOrders = [...orders].sort(
-    (a, b) => statusPriority[a.orderStatus] - statusPriority[b.orderStatus]
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
   );
 
   const filteredOrders =
@@ -50,40 +43,93 @@ const Cart = () => {
       ? sortedOrders
       : sortedOrders.filter((order) => order.orderStatus === filter);
 
-  const handleCancelOrder = async (order) => {
+  const handleUpdateStatusToCancelled = async (order) => {
     if (!window.confirm("Are you sure you want to cancel this order?")) return;
 
     const artworkId = order.a_id?._id || order.a_id;
 
-    if (!artworkId) {
-      alert("Could not find the associated artwork ID.");
-      return;
-    }
-
     try {
-      await axios.delete(`http://localhost:5000/api/orders/${order._id}`);
-      await axios.patch(`http://localhost:5000/api/artworks/${artworkId}`, {
-        isSold: false,
+      await axios.put(`http://localhost:5000/api/orders/${order._id}`, {
+        orderStatus: "cancelled",
       });
 
-      alert("Order cancelled successfully");
-      fetchUserOrders();
+      if (artworkId) {
+        await axios.patch(`http://localhost:5000/api/artworks/${artworkId}`, {
+          isSold: false,
+        });
+      }
+
+      setOrders((prevOrders) =>
+        prevOrders.map((o) =>
+          o._id === order._id ? { ...o, orderStatus: "cancelled" } : o
+        )
+      );
+
+      alert("Order cancelled.");
+      window.location.reload();
     } catch (err) {
-      console.error("Cancellation Error:", err);
-      alert("Failed to cancel order properly");
+      console.error("Error cancelling order:", err);
+      alert("Failed to cancel order.");
     }
   };
 
-  const handleUpdatePayment = async (orderId) => {
+  const handleUpdatePayment = async (
+    orderId,
+    amount,
+    fname,
+    lname,
+    email,
+    phone
+  ) => {
     try {
-      await axios.put(`http://localhost:5000/api/orders/${orderId}`, {
-        paymentMethod: paymentMethods[orderId],
-        orderStatus: "placed",
-      });
-      alert("Order confirmed with updated payment method!");
-      fetchUserOrders();
+      if (paymentMethods[orderId] == "ONLINE") {
+        const { data: keyData } = await axios.get(
+          `http://localhost:5000/api/v1/getkey`
+        );
+        const { key } = keyData;
+        console.log(key);
+
+        const { data: orderData } = await axios.post(
+          `http://localhost:5000/api/v1/payment/process`,
+          {
+            amount,
+          }
+        );
+        const { order } = orderData;
+        console.log(order);
+
+        const options = {
+          key: key, // Replace with your Razorpay key_id
+          amount: amount, // Amount is in currency subunits.
+          currency: "INR",
+          name: fname + " " + lname,
+          description: "Test Transaction",
+          order_id: order.id, // This is the order_id created in the backend
+          callback_url: `http://localhost:5000/api/v1/paymentVerification?orderId=${orderId}`,
+          prefill: {
+            name: fname + " " + lname,
+            email: email,
+            contact: phone,
+          },
+          theme: {
+            color: "#F37254",
+          },
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.open();
+      } else {
+        await axios.put(`http://localhost:5000/api/orders/${orderId}`, {
+          paymentMethod: paymentMethods[orderId],
+          orderStatus: "placed",
+        });
+        alert("Your order has been placed successfully!");
+        window.location.reload();
+      }
+
     } catch (err) {
-      alert("Update failed");
+      console.error("Update failed:", err);
+      alert("Failed to confirm order. Please try again.");
     }
   };
 
@@ -174,29 +220,41 @@ const Cart = () => {
                         ))}
                       </div>
 
-                      {/* NEW: Delivery Address Section */}
                       <div className="mt-3 pt-3 border-t border-gray-200">
                         <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                          Delivery Address
+                          Delivery Information
                         </p>
-                        <p className="text-sm text-gray-600 italic">
-                          {user?.address ||
-                            "No address provided. Please update your profile."}
+                        <p className="text-sm text-gray-600 font-bold capitalize">
+                          {user?.firstName} {user?.lastName}
+                        </p>
+                        <p className="text-sm text-gray-600 italic capitalize">
+                          {user?.address}.
                         </p>
                       </div>
                     </div>
 
                     <div className="flex flex-col gap-3">
                       <button
-                        onClick={() => handleUpdatePayment(item._id)}
-                        className="bg-[#ff751f] text-white px-6 py-2 rounded-lg font-bold hover:bg-[#e66412]"
+                        onClick={() =>
+                          handleUpdatePayment(
+                            item._id,
+                            item.price,
+                            user?.firstName,
+                            user?.lastName,
+                            user?.email,
+                            user?.phone
+                          )
+                        }
+                        className="bg-[#ff751f] text-white px-6 py-2 rounded-lg font-bold hover:bg-[#e66412] transition-colors shadow-sm"
                       >
-                        Confirm Order
+                        {paymentMethods[item._id] === "ONLINE"
+                          ? "Pay Online"
+                          : "Confirm Order"}
                       </button>
+
                       <button
-                        key={item._id}
-                        onClick={() => handleCancelOrder(item)}
-                        className="text-red-500 border border-red-200 px-6 py-2 rounded-lg hover:bg-red-50"
+                        onClick={() => handleUpdateStatusToCancelled(item)} // Changed from handleCancelOrder
+                        className="text-red-500 border border-red-200 px-6 py-2 rounded-lg hover:bg-red-50 transition-colors"
                       >
                         Cancel Order
                       </button>
@@ -264,13 +322,26 @@ const Cart = () => {
                         </p>
                       </div>
                     </div>
-                    <span
-                      className={`px-4 py-1 text-xs rounded-full font-bold uppercase ${statusColor(
-                        order.orderStatus
-                      )}`}
-                    >
-                      {order.orderStatus}
-                    </span>
+                    <div className="flex flex-col items-end gap-2">
+                      <span
+                        className={`px-4 py-1 text-[10px] rounded-full font-bold uppercase ${statusColor(
+                          order.orderStatus
+                        )}`}
+                      >
+                        {order.orderStatus}
+                      </span>
+
+                      {/* Only show Cancel button if status is NOT delivered AND NOT already cancelled */}
+                      {order.orderStatus !== "delivered" &&
+                        order.orderStatus !== "cancelled" && (
+                          <button
+                            onClick={() => handleUpdateStatusToCancelled(order)}
+                            className="text-[10px] text-white bg-red-500 px-4 py-1 rounded-full font-bold uppercase cursor-pointer"
+                          >
+                            Cancel
+                          </button>
+                        )}
+                    </div>
                   </div>
                 ))}
               </div>

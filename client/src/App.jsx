@@ -11,16 +11,17 @@ import Profile from "./component/ArtistComponents/PanelComponents/Profile";
 import Artwork from "./component/ArtistComponents/PanelComponents/Artwork";
 import Order from "./component/ArtistComponents/PanelComponents/Order";
 import Cart from "./component/Cart";
+import PaymentSuccess from "./component/PaymentSuccess";
 import ProtectedRoute from "./ProtectedRoute";
 
 const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<UserRegister />} />
+        <Route path="/" element={<Home />} />
         <Route path="/userlogin" element={<UserLogin />} />
+        <Route path="/userregister" element={<UserRegister />} />
         <Route path="/artistregister" element={<ArtistRegister />} />
-        <Route path="/home" element={<Home />} />
         <Route path="/artistlogin" element={<ArtistLogin />} />
 
         <Route
@@ -39,6 +40,7 @@ const App = () => {
         </Route>
 
         <Route path="/cart" element={<Cart />} />
+        <Route path="/paymentSuccess" element={<PaymentSuccess />} />
       </Routes>
     </BrowserRouter>
   );

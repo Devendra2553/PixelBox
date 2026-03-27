@@ -1,7 +1,5 @@
 const User = require("../models/user.model");
 const Artwork = require("../models/artwork.model");
-const fs = require("fs");
-const path = require("path");
 
 exports.loginUser = async (req, res) => {
   try {
@@ -60,13 +58,9 @@ exports.getUsers = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   try {
-    // 1. Added email and password to the destructured body
     const { firstName, lastName, phone, address, email, password } = req.body;
-
-    // 2. Prepare the update object
     const updateData = { firstName, lastName, phone, address, email };
 
-    // 3. Only add password to the update if it was actually provided
     if (password && password.trim() !== "") {
       updateData.password = password;
     }
@@ -74,14 +68,16 @@ exports.updateUser = async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
       updateData,
-      { new: true, runValidators: true }
+      {
+        returnDocument: 'after',
+        runValidators: true
+      }
     );
 
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // 4. Update artist name in artworks if name changes
     if (firstName || lastName) {
       const fullName = `${updatedUser.firstName} ${updatedUser.lastName}`;
       await Artwork.updateMany(
@@ -95,9 +91,6 @@ exports.updateUser = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
-// Note: You can now delete the exports.updateProfilePhoto function 
-// from your controller file and the corresponding route in user.routes.js
 
 
 exports.deleteUser = async (req, res) => {

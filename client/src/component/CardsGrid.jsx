@@ -48,7 +48,7 @@ const CardGrid = () => {
   const handleBuy = async (artworkId, artistId, isSold) => {
     try {
       const storedUser = localStorage.getItem("user");
-      
+  
       if (!storedUser) {
         alert("Please login first");
         return;
@@ -61,30 +61,37 @@ const CardGrid = () => {
         return;
       }
   
+      // 1. Fetch existing orders for this user
       const ordersRes = await axios.get(`http://localhost:5000/api/orders/user/${user._id}`);
       const existingOrders = ordersRes.data;
   
-      const alreadyInCart = existingOrders.some(order => 
-        order.a_id?._id === artworkId || order.a_id === artworkId
-      );
-
+      // 2. CHECK: Is it in the cart AND NOT cancelled?
+      const activeOrder = existingOrders.find(order => {
+        const matchId = (order.a_id?._id === artworkId || order.a_id === artworkId);
+        // It counts as "already in cart" only if status is NOT cancelled
+        return matchId && order.orderStatus !== "cancelled";
+      });
+  
+      if (activeOrder) {
+        alert("Artwork already in cart or currently being processed.");
+        return;
+      }
+  
+      // 3. If we passed the check, mark artwork as sold
       await axios.patch(`http://localhost:5000/api/artworks/${artworkId}`, {
         isSold: true,
       });
   
-      if (alreadyInCart) {
-        alert("Artwork already in cart");
-        return;
-      }
-  
+      // 4. Create the new order
       await axios.post("http://localhost:5000/api/orders", {
         u_id: user._id,
         a_id: artworkId,
         artist_id: artistId,
         paymentMethod: "COD",
+        orderStatus: "pending" // Ensure it starts as pending/in-cart
       });
   
-      alert("Order placed successfully");
+      alert("Order added to cart successfully");
     } catch (error) {
       console.error("Order failed:", error);
       alert("Order failed: " + (error.response?.data?.message || "Unknown error"));

@@ -1,5 +1,8 @@
 const Order = require("../models/order.model");
 const Artwork = require("../models/artwork.model");
+const { sendMail } = require("../helpers/sendMail");
+const instance = require("../config/razorpay");
+const crypto = require("crypto");
 
 exports.createOrder = async (req, res) => {
   try {
@@ -56,28 +59,27 @@ exports.updateOrder = async (req, res) => {
     const { orderId } = req.params;
     const updates = req.body;
 
-    const allowedUpdates = [
-      "orderStatus",
-      "paymentStatus",
-      "paymentMethod"
-    ];
-
-    const filteredUpdates = {};
-
-    Object.keys(updates).forEach(key => {
-      if (allowedUpdates.includes(key)) {
-        filteredUpdates[key] = updates[key];
-      }
-    });
-
     const updatedOrder = await Order.findByIdAndUpdate(
       orderId,
-      filteredUpdates,
-      { new: true }
-    );
+      { $set: updates },
+      { returnDocument: 'after' }
+    ).populate("u_id", "email firstName");
 
     if (!updatedOrder) {
       return res.status(404).json({ message: "Order not found" });
+    }
+
+    if (updates.orderStatus === "cancelled") {
+      await Artwork.findByIdAndUpdate(updatedOrder.a_id, { isSold: false });
+    }
+
+    if (updates.orderStatus && updatedOrder.u_id?.email) {
+      const userEmail = updatedOrder.u_id.email;
+      const userName = updatedOrder.u_id.firstName;
+      const subject = `Order Update: ${updates.orderStatus}`;
+      const text = `Hello ${userName},\n\nYour order for "${updatedOrder.title} by ${updatedOrder.artistName}" has been ${updates.orderStatus}.\n\nThank you for shopping with us!`;
+
+      sendMail(userEmail, subject, text);
     }
 
     res.json({
@@ -96,7 +98,7 @@ exports.getArtistOrders = async (req, res) => {
 
     const orders = await Order.find({ artist_id })
       .populate("a_id")
-      .populate("u_id", "firstName lastName phone address email") 
+      .populate("u_id", "firstName lastName phone address email paymentMethod paymentStatus")
       .sort({ createdAt: -1 });
 
     res.json(orders);
@@ -109,7 +111,7 @@ exports.deleteOrder = async (req, res) => {
   try {
     const { id } = req.params;
     const order = await Order.findOne({ _id: id });
-    
+
     if (!order) {
       return res.status(404).json({ message: "Order not found or cannot be cancelled" });
     }
@@ -120,3 +122,50 @@ exports.deleteOrder = async (req, res) => {
     res.status(500).json({ message: "Error deleting order", error: error.message });
   }
 };
+
+
+exports.processPayment = async (req, res) => {
+  const options = {
+    amount: Number(req.body.amount * 100), //cents
+    currency: "INR"
+  }
+
+  const order = await instance.orders.create(options)
+
+  res.status(200).json({
+    success: true,
+    order
+  })
+}
+
+
+exports.getKey = async (req, res) => {
+  res.status(200).json({
+    key: process.env.RAZORPAY_KEY
+  })
+}
+
+exports.paymentVerification = async (req, res) => {
+  const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body
+  const { orderId } = req.query;
+
+  const body = razorpay_order_id + '|' + razorpay_payment_id;
+  const expected_signature = crypto.createHmac("sha256", process.env.RAZORPAY_SEC).update(body.toString()).digest("hex");
+
+  console.log(`EXPECTED_SIGNATURE: ${expected_signature}`)
+  console.log(`RAZORPAY_SIGNATURE: ${razorpay_signature}`)
+
+  const isAuthentic = expected_signature === razorpay_signature;
+
+  if (isAuthentic) {
+    return res.redirect(`http://localhost:5173/paymentSuccess?reference=${razorpay_payment_id}&orderId=${orderId}`);
+  } else {
+    res.status(404).json({
+      success: false
+    })
+  }
+
+  res.status(200).json({
+    success: true
+  })
+}

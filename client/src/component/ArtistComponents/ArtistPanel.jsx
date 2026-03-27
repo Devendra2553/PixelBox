@@ -6,6 +6,7 @@ import {
   Image,
   ShoppingCart,
   Menu,
+  LogOut
 } from "lucide-react";
 
 const ArtistPanel = () => {
@@ -16,6 +17,7 @@ const ArtistPanel = () => {
     { to: "artwork", label: "Artwork", icon: Image },
     { to: "order", label: "Order", icon: ShoppingCart },
     { to: "profile", label: "Profile", icon: UserCog },
+    { to: "/artistlogin", label: "Log Out", icon: LogOut },
   ];
 
   return (

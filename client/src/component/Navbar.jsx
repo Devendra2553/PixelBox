@@ -3,26 +3,37 @@ import { ShoppingCart, Paintbrush, Link2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Navbar = () => {
-  const [hover, setHover] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const toggleMenu = () => {
+    setIsOpen((prev) => !prev);
+  };
 
   return (
     <nav className="h-16 w-full bg-[#ff751f] text-white px-6 flex items-center justify-between fixed top-0 z-50">
-      <Link to="/artistlogin">
-        <div
-          className="relative flex items-center gap-2 cursor-pointer"
-          onMouseEnter={() => setHover(true)}
-          onMouseLeave={() => setHover(false)}
-        >
-          <Paintbrush size={25} />
-          {hover && (
-            <span className="absolute whitespace-nowrap top-8 left-0 font-medium bg-[#fffffff0] text-[#ff751f] px-2 rounded shadow">
+      <div
+        className="relative flex items-center gap-2 cursor-pointer"
+        onClick={toggleMenu}
+      >
+        <Paintbrush size={25} />
+        {isOpen && (
+          <span className="absolute whitespace-nowrap flex flex-col top-8 left-0 font-medium">
+            <Link
+              className="bg-[#fffffff0] text-[#ff751f] py-1 px-2 rounded shadow m-1 hover:bg-orange-200"
+              to="/artistlogin"
+            >
               Login as artist
-            </span>
-          )}
-        </div>
-      </Link>
+            </Link>
+            <Link
+              className="bg-[#fffffff0] text-[#ff751f] py-1 px-2 rounded shadow m-1 hover:bg-orange-200"
+              to="/userlogin"
+            >
+              Login as customer
+            </Link>
+          </span>
+        )}
+      </div>
 
-      <Link to="/home">
+      <Link to="/">
         <h1 className="text-3xl font-bold tracking-wide">PixelBox</h1>
       </Link>
 

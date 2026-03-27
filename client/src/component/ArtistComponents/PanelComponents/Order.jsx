@@ -28,49 +28,39 @@ const Order = () => {
     fetchArtistOrders();
   }, []);
 
-  const orderCancle = async (order) => {
-    const artworkId = order.a_id?._id || order.a_id;
+const filteredOrders = orders.filter((order) => {
+  if (order.orderStatus === "pending") return false;
 
-    if (!artworkId) {
-      alert("Error: Artwork reference not found on this order.");
-      return;
-    }
+  if (filter === "delivered") return order.orderStatus === "delivered";
+  if (filter === "cancelled") return order.orderStatus === "cancelled";
+  
+  if (filter === "pending") {
+    return order.orderStatus === "shipped" || order.orderStatus === "placed";
+  }
 
-    if (!window.confirm("Are you sure you want to cancel this order?")) return;
-
-    try {
-      await axios.delete(`http://localhost:5000/api/orders/${order._id}`);
-      await axios.patch(`http://localhost:5000/api/artworks/${artworkId}`, {
-        isSold: false,
-      });
-
-      alert("Order cancelled successfully!");
-      setOrders((prev) => prev.filter((o) => o._id !== order._id));
-    } catch (err) {
-      console.error("Cancellation Error:", err);
-      alert("Order was deleted, but failed to update artwork status.");
-      fetchArtistOrders();
-    }
-  };
-
-  const filteredOrders = orders.filter((order) => {
-    if (filter === "delivered") return order.orderStatus === "delivered";
-    if (filter === "pending")
-      return order.orderStatus === "shipped" || order.orderStatus === "pending" || order.orderStatus === "placed";
-    return true;
-  });
+  return true;
+});
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
-      await axios.put(`http://localhost:5000/api/orders/${orderId}`, {
+      const isDelivered = newStatus === "delivered";
+
+      const updateData = {
         orderStatus: newStatus,
-      });
+        ...(isDelivered && { paymentStatus: "paid" }),
+      };
+      await axios.put(
+        `http://localhost:5000/api/orders/${orderId}`,
+        updateData
+      );
+
       setOrders(
         orders.map((order) =>
-          order._id === orderId ? { ...order, orderStatus: newStatus } : order
+          order._id === orderId ? { ...order, ...updateData } : order
         )
       );
     } catch (err) {
+      console.error(err);
       alert("Failed to update status");
     }
   };
@@ -83,7 +73,7 @@ const Order = () => {
 
       {/* Filter Buttons */}
       <div className="flex gap-3 mb-6">
-        {["all", "pending", "delivered"].map((type) => (
+        {["all", "pending", "delivered", "cancelled"].map((type) => (
           <button
             key={type}
             onClick={() => setFilter(type)}
@@ -121,39 +111,37 @@ const Order = () => {
               </div>
 
               {/* Custom Styled Dropdown */}
-<div className="relative z-10">
-  <div className="flex items-center px-3 py-1.5 gap-2">
-    <span className="font-semibold text-md">Status: </span>
-    <div className="relative">
-      <select
-        value={order.orderStatus}
-        onChange={(e) => handleStatusChange(order._id, e.target.value)}
-        // LOCK: Disable if status is delivered OR cancelled
-        disabled={order.orderStatus === "delivered"}
-        className={`p-2 rounded-lg outline-none font-semibold transition mr-1 
-          ${(order.orderStatus === "delivered") 
-            ? "bg-gray-100 text-gray-500 cursor-not-allowed" 
-            : "bg-gray-200 cursor-pointer"}`}
-      >
-        <option value="placed">Placed</option>
-        <option value="shipped">Shipped</option>
-        <option value="delivered">Delivered</option>
-      </select>
-    </div>
-
-    {/* REMOVE: Hide cancel button if status is delivered OR cancelled */}
-    {order.orderStatus !== "delivered" && (
-      <div>
-        <button
-          onClick={() => orderCancle(order)}
-          className="bg-red-500 text-white font-semibold px-2 py-1 rounded-md border-0 hover:bg-red-600 cursor-pointer"
-        >
-          Cancel Order
-        </button>
-      </div>
-    )}
-  </div>
-</div>
+              <div className="relative z-10">
+                <div className="flex items-center px-3 py-1.5 gap-2">
+                  <span className="font-semibold text-md">Status: </span>
+                  <div className="relative">
+                    <select
+                      value={order.orderStatus}
+                      onChange={(e) =>
+                        handleStatusChange(order._id, e.target.value)
+                      }
+                      // LOCK: Disable the dropdown if the status is finalized
+                      disabled={
+                        order.orderStatus === "delivered" ||
+                        order.orderStatus === "cancelled"
+                      }
+                      className={`p-2 rounded-lg outline-none font-semibold transition mr-1 
+                        ${
+                          order.orderStatus === "delivered"
+                            ? "bg-green-200 text-green-800 cursor-not-allowed"
+                            : order.orderStatus === "cancelled"
+                            ? "bg-red-200 text-red-800 cursor-not-allowed"
+                            : "bg-gray-200 cursor-pointer hover:border-b-2 border-gray-400"
+                        }`}
+                    >
+                      <option value="placed">Placed</option>
+                      <option value="shipped">Shipped</option>
+                      <option value="delivered">Delivered</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="mt-2 pt-4 border-t border-gray-300 grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-xl">
@@ -166,6 +154,9 @@ const Order = () => {
                 </p>
                 <p className="text-sm text-gray-600">
                   Phone: +91 {order.u_id?.phone || "N/A"}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Email: {order.u_id?.email || "N/A"}
                 </p>
               </div>
               <div className="space-y-1">
