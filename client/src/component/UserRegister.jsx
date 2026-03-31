@@ -26,19 +26,29 @@ const UserRegister = () => {
 
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: validatedValue,
     });
   };
 
   const navigate = useNavigate();
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    if (e) e.preventDefault();
+
     if (formData.password !== formData.confirmPassword) {
       return alert("Passwords do not match");
     }
 
+    const isPhoneValid = /^\d+$/.test(formData.phone);
+    if (!isPhoneValid) {
+      return alert("Please enter a valid phone number containing only digits.");
+    } else if (formData.phone.length !== 10) {
+      return alert("Phone number must be in 10 digits.");
+    }
     try {
-      await userBaseUrl.post("/users/register", formData);
+      const { confirmPassword, ...submitData } = formData;
+
+      await userBaseUrl.post("/users/register", submitData);
       navigate("/userlogin");
     } catch (error) {
       console.log(error);

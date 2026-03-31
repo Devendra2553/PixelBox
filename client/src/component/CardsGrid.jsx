@@ -31,9 +31,11 @@ const CardGrid = () => {
   const artists = ["Artist", ...new Set(artworks.map((a) => a.artistName))];
 
   const filteredArt = artworks.filter((item) => {
+    const term = searchTerm.toLowerCase();
+
     const matchesSearch =
-      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.category.toLowerCase().includes(searchTerm.toLowerCase());
+      item.title.toLowerCase().includes(term) ||
+      (item.artistName || "").toLowerCase().includes(term);
 
     const matchesCategory =
       selectedCategory === "Category" || item.category === selectedCategory;
@@ -63,11 +65,9 @@ const CardGrid = () => {
       const ordersRes = await userBaseUrl.get(`/orders/user/${user._id}`);
       const existingOrders = ordersRes.data;
 
-      // if it in the cart AND NOT cancelled?
       const activeOrder = existingOrders.find((order) => {
         const matchId =
           order.a_id?._id === artworkId || order.a_id === artworkId;
-        // It counts as "already in cart" only if status is NOT cancelled
         return matchId && order.orderStatus !== "cancelled";
       });
 
@@ -106,7 +106,7 @@ const CardGrid = () => {
           <input
             type="text"
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search..."
+            placeholder="Search by title or artist..."
             className="w-full pl-5 pr-14 py-3 rounded-full border border-[#ff751f] focus:outline-none focus:ring-2 focus:ring-[#ff751f]/30"
           />
           <button className="absolute right-2 top-1/2 -translate-y-1/2 bg-[#ff751f] text-white p-2 rounded-full hover:bg-[#e66412] transition">
@@ -180,6 +180,7 @@ const CardGrid = () => {
             onClick={() => {
               setSelectedCategory("Category");
               setSelectedArtist("Artist");
+              setSearchTerm("");
             }}
             className="bg-white text-[#ff751f] p-1 rounded-xl font-semibold hover:bg-gray-100 transition"
           >
@@ -190,47 +191,53 @@ const CardGrid = () => {
 
       {/* Grid Display */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 mt-10">
-        {filteredArt.map((item) => (
-          <div
-            key={item._id}
-            className="bg-white rounded-2xl shadow-md overflow-hidden flex flex-col hover:shadow-xl transition"
-          >
-            <div className="relative w-full aspect-4/5 overflow-hidden">
-              <img
-                src={`${API_BASE_URL}${item.imageUrl}`}
-                alt={item.title}
-                className="w-full h-full object-cover"
-              />
-              {item.isSold && (
-                <span className="absolute bottom-2 right-2 bg-red-500/50 text-white text-xs px-3 py-1 rounded-full">
-                  Sold
-                </span>
-              )}
-            </div>
+        {filteredArt.length > 0 ? (
+          filteredArt.map((item) => (
+            <div
+              key={item._id}
+              className="bg-white rounded-2xl shadow-md overflow-hidden flex flex-col hover:shadow-xl transition"
+            >
+              <div className="relative w-full aspect-4/5 overflow-hidden">
+                <img
+                  src={`${API_BASE_URL}${item.imageUrl}`}
+                  alt={item.title}
+                  className="w-full h-full object-cover"
+                />
+                {item.isSold && (
+                  <span className="absolute bottom-2 right-2 bg-red-500/50 text-white text-xs px-3 py-1 rounded-full">
+                    Sold
+                  </span>
+                )}
+              </div>
 
-            <div className="flex flex-col grow p-4 space-y-1">
-              <h3 className="font-semibold capitalize text-lg">{item.title}</h3>
-              <h5 className="font-md capitalize text-sm">{item.category}</h5>
-              <h5 className="text-md capitalize text-gray-500">
-                {item?.artistName || "Unknown Artist"}
-              </h5>
-              <p className="font-bold text-xl text-[#ff751f] pt-1">
-                ₹{item.price}
-              </p>
-              <div className="grow" />
-              <button
-                onClick={() => handleBuy(item._id, item.u_id, item.isSold)}
-                className={`w-full py-2 rounded-xl transition ${
-                  item.isSold
-                    ? "bg-gray-300 cursor-not-allowed"
-                    : "bg-[#ff751f] text-white hover:bg-[#e66412]"
-                }`}
-              >
-                {item.isSold ? "Sold Out" : "Buy Now"}
-              </button>
+              <div className="flex flex-col grow p-4 space-y-1">
+                <h3 className="font-semibold capitalize text-lg">{item.title}</h3>
+                <h5 className="font-md capitalize text-sm">{item.category}</h5>
+                <h5 className="text-md capitalize text-gray-500">
+                  {item?.artistName || "Unknown Artist"}
+                </h5>
+                <p className="font-bold text-xl text-[#ff751f] pt-1">
+                  ₹{item.price}
+                </p>
+                <div className="grow" />
+                <button
+                  onClick={() => handleBuy(item._id, item.u_id, item.isSold)}
+                  className={`w-full py-2 rounded-xl transition ${
+                    item.isSold
+                      ? "bg-gray-300 cursor-not-allowed"
+                      : "bg-[#ff751f] text-white hover:bg-[#e66412]"
+                  }`}
+                >
+                  {item.isSold ? "Sold Out" : "Buy Now"}
+                </button>
+              </div>
             </div>
+          ))
+        ) : (
+          <div className="col-span-full py-20 text-center text-gray-400">
+            No artworks found.
           </div>
-        ))}
+        )}
       </div>
     </div>
   );

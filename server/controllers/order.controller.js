@@ -6,7 +6,7 @@ const crypto = require("crypto");
 
 exports.createOrder = async (req, res) => {
   try {
-    const u_id = req.user.id; 
+    const u_id = req.user.id;
     const { a_id, paymentMethod } = req.body;
 
     if (!u_id || !a_id) {
@@ -42,7 +42,7 @@ exports.createOrder = async (req, res) => {
 
 exports.getUserOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ u_id: req.user.id }) 
+    const orders = await Order.find({ u_id: req.user.id })
       .populate("a_id")
       .sort({ createdAt: -1 });
     res.json(orders);
@@ -90,13 +90,26 @@ exports.updateOrder = async (req, res) => {
   }
 };
 
+
+exports.getAllOrders = async (req, res) => {
+  try {
+    const orders = await Order.find()
+      .populate("a_id")
+      .populate("u_id", "firstName lastName email phone address")
+      .sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 exports.getArtistOrders = async (req, res) => {
   try {
     const { artist_id } = req.params;
 
     const orders = await Order.find({ artist_id })
       .populate("a_id")
-      .populate("u_id", "firstName lastName phone address email paymentMethod paymentStatus")
+      .populate("u_id", "firstName lastName phone address email")
       .sort({ createdAt: -1 });
 
     res.json(orders);
@@ -108,11 +121,16 @@ exports.getArtistOrders = async (req, res) => {
 exports.deleteOrder = async (req, res) => {
   try {
     const { id } = req.params;
-    const order = await Order.findOne({ _id: id });
+    // const order = await Order.findOne({ _id: id });
+    const order = await Order.findById(id);
 
     if (!order) {
       return res.status(404).json({ message: "Order not found or cannot be cancelled" });
     }
+
+    await Artwork.findByIdAndUpdate(order.a_id, { 
+      $set: { isSold: false } 
+    });
 
     await Order.findByIdAndDelete(id);
     res.status(200).json({ message: "Order cancelled and removed successfully" });

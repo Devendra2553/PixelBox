@@ -118,7 +118,6 @@ const Order = () => {
                       onChange={(e) =>
                         handleStatusChange(order._id, e.target.value)
                       }
-                      // LOCK: Disable the dropdown if the status is finalized
                       disabled={
                         order.orderStatus === "delivered" ||
                         order.orderStatus === "cancelled"
@@ -163,6 +162,18 @@ const Order = () => {
                 </p>
                 <p className="text-sm capitalize text-gray-600 leading-relaxed">
                   {order.u_id?.address || "No address provided"}
+                </p>
+                <p className="text-sm font-medium text-gray-600">
+                  Method: {order.paymentMethod}
+                </p>
+                <p
+                  className={`text-xs font-bold uppercase ${
+                    order.paymentStatus === "paid"
+                      ? "text-green-500"
+                      : "text-red-400"
+                  }`}
+                >
+                  Payment: {order.paymentStatus}
                 </p>
               </div>
             </div>

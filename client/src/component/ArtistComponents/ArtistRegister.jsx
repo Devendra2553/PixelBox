@@ -14,6 +14,8 @@ const ArtistRegister = () => {
     role: "artist",
   });
 
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     let validatedValue = value;
@@ -26,23 +28,31 @@ const ArtistRegister = () => {
 
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: validatedValue,
     });
   };
 
-  const navigate = useNavigate();
+  const handleSubmit = async (e) => {
+    if (e) e.preventDefault();
 
-  const handleSubmit = async () => {
     if (formData.password !== formData.confirmPassword) {
       return alert("Passwords do not match");
     }
 
+    const isPhoneValid = /^\d+$/.test(formData.phone);
+    if (!isPhoneValid) {
+      return alert("Please enter a valid phone number containing only digits.");
+    } else if (formData.phone.length !== 10) {
+      return alert("Phone number must be in 10 digits.");
+    }
     try {
-      await userBaseUrl.post("/users/register", formData);
+      const { confirmPassword, ...submitData } = formData;
+
+      await userBaseUrl.post("/users/register", submitData);
       navigate("/artistlogin");
     } catch (error) {
       console.log(error);
-      alert("Registration failed");
+      alert(error.response?.data?.message || "Registration failed");
     }
   };
   return (
@@ -56,7 +66,13 @@ const ArtistRegister = () => {
           />
         </div>
         <div className="w-full md:w-1/2 flex items-center justify-center p-8 md:p-16 md:ml[50%]">
-          <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="w-full max-w-md space-y-3">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmit();
+            }}
+            className="w-full max-w-md space-y-3"
+          >
             <h2 className="text-3xl font-bold text-[#ff751f]">
               Artist Register
             </h2>

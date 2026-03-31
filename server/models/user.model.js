@@ -3,12 +3,8 @@ const mongoose = require("mongoose");
 const userSchema = new mongoose.Schema({
   role: {
     type: String,
-    enum: ["artist", "customer"],
+    enum: ["artist", "customer", "admin"],
     required: true
-  },
-  profileImage: {
-    type: String,
-    default: "uploads/default.jpg"
   },
   firstName: {
     type: String,

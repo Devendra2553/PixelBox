@@ -9,8 +9,9 @@ router.post("/", verifyToken, orderController.createOrder);
 router.get("/user/:u_id", verifyToken, orderController.getUserOrders);
 router.put("/:orderId", verifyToken, orderController.updateOrder);
 router.get("/artist/:artist_id", verifyToken, orderController.getArtistOrders);
+router.get("/", verifyToken, orderController.getAllOrders);
+router.delete("/:id", verifyToken, orderController.deleteOrder);
 
-router.delete("/:id", orderController.deleteOrder);
 
 // Razorpay routes
 router.post("/payment/process", orderController.processPayment)

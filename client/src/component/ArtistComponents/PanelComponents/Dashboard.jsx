@@ -19,8 +19,6 @@ const Dashboard = () => {
         setLoading(true);
 
         const [artworksRes, ordersRes] = await Promise.all([
-          // userBaseUrl.get(`http://localhost:5000/api/artworks/artist/${artistId}`),
-          // userBaseUrl.get(`http://localhost:5000/api/orders/artist/${artistId}`),
           userBaseUrl.get(`/artworks/artist/${artistId}`),
           userBaseUrl.get(`/orders/artist/${artistId}`),
         ]);
