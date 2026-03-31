@@ -16,17 +16,17 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/api/v1", payment);
 app.use("/api/users", userRoutes);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/artworks", artworkRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/v1", payment);
 
 connetdb().then(() => {
   console.log("connetions Successfully done!!");
   app.listen(5000, () => {
-    console.log("Server is runing on port 5000");
-  })
+    console.log(`Server is running on port 5000`);
+});
 }).catch((error) => {
   console.log("Connetions failed mongoDb not Conneted", error.message)
 });

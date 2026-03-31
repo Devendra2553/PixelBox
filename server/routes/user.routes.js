@@ -1,11 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/user.controller");
+const verifyToken = require("../middleware/auth");
 
-router.get("/", userController.getUsers);
+// Public routes
 router.post("/register", userController.registerUser);
-router.patch("/:id", userController.updateUser);
-router.delete("/:id", userController.deleteUser);
 router.post("/login", userController.loginUser);
+router.get("/", userController.getUsers);
+
+// Protected routes
+router.patch("/:id", verifyToken, userController.updateUser);
+router.delete("/:id", verifyToken, userController.deleteUser);
+router.get("/me", verifyToken, userController.getMe);
 
 module.exports = router;

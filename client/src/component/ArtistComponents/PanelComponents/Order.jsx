@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import userBaseUrl from "../../../axioInstance";
 
 const Order = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
-  const [openDropdownId, setOpenDropdownId] = useState(null);
 
   const fetchArtistOrders = async () => {
     try {
@@ -13,9 +12,8 @@ const Order = () => {
       if (!storedUser) return;
       const artist = JSON.parse(storedUser);
 
-      const res = await axios.get(
-        `http://localhost:5000/api/orders/artist/${artist._id}`
-      );
+      const res = await userBaseUrl.get(`/orders/artist/${artist._id}`);
+
       setOrders(res.data);
     } catch (err) {
       console.error("Error fetching artist orders:", err);
@@ -28,18 +26,18 @@ const Order = () => {
     fetchArtistOrders();
   }, []);
 
-const filteredOrders = orders.filter((order) => {
-  if (order.orderStatus === "pending") return false;
+  const filteredOrders = orders.filter((order) => {
+    if (order.orderStatus === "pending") return false;
 
-  if (filter === "delivered") return order.orderStatus === "delivered";
-  if (filter === "cancelled") return order.orderStatus === "cancelled";
-  
-  if (filter === "pending") {
-    return order.orderStatus === "shipped" || order.orderStatus === "placed";
-  }
+    if (filter === "delivered") return order.orderStatus === "delivered";
+    if (filter === "cancelled") return order.orderStatus === "cancelled";
 
-  return true;
-});
+    if (filter === "pending") {
+      return order.orderStatus === "shipped" || order.orderStatus === "placed";
+    }
+
+    return true;
+  });
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
@@ -49,7 +47,7 @@ const filteredOrders = orders.filter((order) => {
         orderStatus: newStatus,
         ...(isDelivered && { paymentStatus: "paid" }),
       };
-      await axios.put(
+      await userBaseUrl.put(
         `http://localhost:5000/api/orders/${orderId}`,
         updateData
       );

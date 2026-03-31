@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const path = require("path");
+const verifyToken = require("../middleware/auth");
 const artworkController = require("../controllers/artwork.controller");
 
 const storage = multer.diskStorage({
@@ -13,11 +14,16 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-router.post("/", upload.single("image"), artworkController.createArtwork);
+// Public routes
 router.get("/", artworkController.getArtworks);
 router.get("/:id", artworkController.getArtworkById);
-router.patch("/:id", artworkController.updateArtwork);
-router.delete("/:id", artworkController.deleteArtwork);
 router.get("/artist/:artistId", artworkController.getArtworksByArtist);
+
+// Protect routes
+router.post("/", verifyToken, upload.single("image"), artworkController.createArtwork); 
+router.patch("/:id", verifyToken, artworkController.updateArtwork);
+router.delete("/:id", verifyToken, artworkController.deleteArtwork);
+
+
 
 module.exports = router;

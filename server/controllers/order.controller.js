@@ -6,7 +6,8 @@ const crypto = require("crypto");
 
 exports.createOrder = async (req, res) => {
   try {
-    const { u_id, a_id, paymentMethod } = req.body;
+    const u_id = req.user.id; 
+    const { a_id, paymentMethod } = req.body;
 
     if (!u_id || !a_id) {
       return res.status(400).json({ message: "Missing required fields" });
@@ -41,12 +42,9 @@ exports.createOrder = async (req, res) => {
 
 exports.getUserOrders = async (req, res) => {
   try {
-    const { u_id } = req.params;
-
-    const orders = await Order.find({ u_id })
+    const orders = await Order.find({ u_id: req.user.id }) 
       .populate("a_id")
       .sort({ createdAt: -1 });
-
     res.json(orders);
 
   } catch (error) {

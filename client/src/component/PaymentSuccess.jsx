@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import axios from 'axios';
 import { CheckCircle, Package, ArrowRight } from 'lucide-react';
+import userBaseUrl from '../axioInstance';
 
 const PaymentSuccess = () => {
   const [searchQuery] = useSearchParams();
@@ -17,11 +17,10 @@ const PaymentSuccess = () => {
       }
 
       try {
-        await axios.put(`http://localhost:5000/api/orders/${orderId}`, {
+        await userBaseUrl.put(`/orders/${orderId}`, {
           paymentStatus: "paid",
           orderStatus: "placed",
           paymentMethod: "ONLINE",
-        //   razorpayPaymentId: reference 
         });
         
         setLoading(false);

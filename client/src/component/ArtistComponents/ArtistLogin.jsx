@@ -13,14 +13,15 @@ const ArtistLogin = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await userBaseUrl.post("/login", form);
-      const { user } = res.data;
+      const res = await userBaseUrl.post("/users/login", form);
+      const { user, token } = res.data;
 
       if (user.role !== "artist") {
         alert("Access Denied: This is an Artist-only login.");
         return;
       }
       
+      localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
       navigate("/artistpanel/dashboard");

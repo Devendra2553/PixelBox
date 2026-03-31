@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import artistBaseURL from "../../../axioInstance";
 import AddArtwork from "./AddArtwork";
 import { Trash2 } from "lucide-react";
 
@@ -15,7 +15,7 @@ const Artwork = () => {
   useEffect(() => {
     const fetchArtworks = async () => {
       try {
-        const res = await axios.get(`${API_BASE_URL}api/artworks`);
+        const res = await artistBaseURL.get(`${API_BASE_URL}api/artworks`);
 
         const myArtworks = res.data.filter((a) => {
           const id = typeof a.u_id === "object" ? a.u_id._id : a.u_id;
@@ -37,7 +37,7 @@ const Artwork = () => {
     if (!window.confirm("Are you sure you want to delete this artwork?"))
       return;
     try {
-      await axios.delete(`${API_BASE_URL}api/artworks/${id}`);
+      await artistBaseURL.delete(`${API_BASE_URL}api/artworks/${id}`);
       setArtworks(artworks.filter((art) => art._id !== id));
     } catch (err) {
       alert("Failed to delete artwork");

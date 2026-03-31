@@ -49,7 +49,7 @@ exports.updateArtwork = async (req, res) => {
     const updatedArtwork = await Artwork.findByIdAndUpdate(
       req.params.id, 
       req.body,
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     );
     
     if (!updatedArtwork) return res.status(404).json({ message: "Artwork not found" });

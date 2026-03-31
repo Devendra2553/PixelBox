@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import userBaseUrl from "../axioInstance";
 
 const UserLogin = () => {
   const navigate = useNavigate();
@@ -13,13 +13,11 @@ const UserLogin = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/users/login",
-        form
-      );
-      const { user } = res.data;
+      const res = await userBaseUrl.post("/users/login", form);
+      const { user, token } = res.data;
 
       localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("token", token);
 
       navigate("/");
     } catch (err) {

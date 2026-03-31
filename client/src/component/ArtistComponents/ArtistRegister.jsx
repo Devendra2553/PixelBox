@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import userBaseUrl from "../../axioInstance";
 
 const ArtistRegister = () => {
@@ -15,6 +15,15 @@ const ArtistRegister = () => {
   });
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
+    let validatedValue = value;
+
+    if (name === "firstName" || name === "lastName") {
+      validatedValue = value.replace(/[^a-zA-Z\s]/g, "");
+    } else if (name === "phone") {
+      validatedValue = value.replace(/[^0-9]/g, "");
+    }
+
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -29,7 +38,7 @@ const ArtistRegister = () => {
     }
 
     try {
-      await userBaseUrl.post("register", formData);
+      await userBaseUrl.post("/users/register", formData);
       navigate("/artistlogin");
     } catch (error) {
       console.log(error);

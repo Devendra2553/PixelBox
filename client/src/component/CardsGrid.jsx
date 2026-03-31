@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import userBaseUrl from "../axioInstance";
 import { Search, ChevronDown, RotateCcw } from "lucide-react";
 
 const CardGrid = () => {
@@ -7,7 +7,6 @@ const CardGrid = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // New state for dropdowns and filters
   const [open, setOpen] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("Category");
   const [selectedArtist, setSelectedArtist] = useState("Artist");
@@ -17,7 +16,7 @@ const CardGrid = () => {
   useEffect(() => {
     const fetchArtworks = async () => {
       try {
-        const res = await axios.get(`${API_BASE_URL}api/artworks`);
+        const res = await userBaseUrl.get("/artworks");
         setArtworks(res.data);
       } catch (err) {
         console.error("Error fetching artworks:", err);
@@ -48,53 +47,51 @@ const CardGrid = () => {
   const handleBuy = async (artworkId, artistId, isSold) => {
     try {
       const storedUser = localStorage.getItem("user");
-  
+
       if (!storedUser) {
         alert("Please login first");
         return;
       }
-  
+
       const user = JSON.parse(storedUser);
-  
+
       if (isSold) {
         alert("This artwork is sold out");
         return;
       }
-  
-      // 1. Fetch existing orders for this user
-      const ordersRes = await axios.get(`http://localhost:5000/api/orders/user/${user._id}`);
+
+      const ordersRes = await userBaseUrl.get(`/orders/user/${user._id}`);
       const existingOrders = ordersRes.data;
-  
-      // 2. CHECK: Is it in the cart AND NOT cancelled?
-      const activeOrder = existingOrders.find(order => {
-        const matchId = (order.a_id?._id === artworkId || order.a_id === artworkId);
+
+      // if it in the cart AND NOT cancelled?
+      const activeOrder = existingOrders.find((order) => {
+        const matchId =
+          order.a_id?._id === artworkId || order.a_id === artworkId;
         // It counts as "already in cart" only if status is NOT cancelled
         return matchId && order.orderStatus !== "cancelled";
       });
-  
+
       if (activeOrder) {
         alert("Artwork already in cart or currently being processed.");
         return;
       }
-  
-      // 3. If we passed the check, mark artwork as sold
-      await axios.patch(`http://localhost:5000/api/artworks/${artworkId}`, {
-        isSold: true,
-      });
-  
-      // 4. Create the new order
-      await axios.post("http://localhost:5000/api/orders", {
+
+      await userBaseUrl.patch(`/artworks/${artworkId}`, { isSold: true });
+
+      await userBaseUrl.post("/orders", {
         u_id: user._id,
         a_id: artworkId,
         artist_id: artistId,
         paymentMethod: "COD",
-        orderStatus: "pending" // Ensure it starts as pending/in-cart
+        orderStatus: "pending",
       });
-  
+
       alert("Order added to cart successfully");
     } catch (error) {
       console.error("Order failed:", error);
-      alert("Order failed: " + (error.response?.data?.message || "Unknown error"));
+      alert(
+        "Order failed: " + (error.response?.data?.message || "Unknown error")
+      );
     }
   };
 

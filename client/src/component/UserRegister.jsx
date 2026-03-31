@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import userBaseUrl from "../axioInstance";
 
 const UserRegister = () => {
@@ -15,6 +15,15 @@ const UserRegister = () => {
   });
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
+    let validatedValue = value;
+
+    if (name === "firstName" || name === "lastName") {
+      validatedValue = value.replace(/[^a-zA-Z\s]/g, "");
+    } else if (name === "phone") {
+      validatedValue = value.replace(/[^0-9]/g, "");
+    }
+
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -29,11 +38,11 @@ const UserRegister = () => {
     }
 
     try {
-      await userBaseUrl.post("register", formData);
+      await userBaseUrl.post("/users/register", formData);
       navigate("/userlogin");
     } catch (error) {
       console.log(error);
-      alert("Registration failed");
+      alert(error.response?.data?.message || "Registration failed");
     }
   };
   return (
@@ -47,7 +56,13 @@ const UserRegister = () => {
           />
         </div>
         <div className="w-full md:w-1/2 flex items-center justify-center p-8 md:p-16 md:ml[50%]">
-          <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="w-full max-w-md space-y-3">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmit();
+            }}
+            className="w-full max-w-md space-y-3"
+          >
             <h2 className="text-3xl font-bold text-[#ff751f]">Register</h2>
 
             <input

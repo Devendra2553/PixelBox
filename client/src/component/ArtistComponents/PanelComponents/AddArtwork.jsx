@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import userBaseUrl from "../../../axioInstance";
 
 const AddArtwork = ({ onUploadSuccess }) => {
   const [formData, setFormData] = useState({
@@ -7,22 +7,27 @@ const AddArtwork = ({ onUploadSuccess }) => {
     category: "",
     price: "",
   });
+
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState("");
+
   const handleChange = (e) => {
+    const { name, value } = e.target;
+    let validatedValue = value;
+    if (name === "price") {
+      validatedValue = value.replace(/[^0-9]/g, "");
+    }
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
 
-  // Handle file selection and generate preview
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setImage(file);
-      // Creates a temporary URL for previewing
-      setPreview(URL.createObjectURL(file)); 
+      setPreview(URL.createObjectURL(file));
     }
   };
 
@@ -45,13 +50,12 @@ const AddArtwork = ({ onUploadSuccess }) => {
     data.append("image", image);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/artworks", data);
+      const res = await userBaseUrl.post("/artworks", data);
       alert("Artwork uploaded successfully");
 
-      // Reset everything after success
       setFormData({ title: "", category: "", price: "" });
       setImage(null);
-      setPreview(""); 
+      setPreview("");
 
       if (onUploadSuccess) onUploadSuccess(res.data);
     } catch (err) {

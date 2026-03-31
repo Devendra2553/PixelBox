@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "./Navbar";
-import axios from "axios";
+import userBaseUrl from "../axioInstance";
 
 const Cart = () => {
   const [orders, setOrders] = useState([]);
   const [paymentMethods, setPaymentMethods] = useState({});
   const [filter, setFilter] = useState("all");
 
-  // Get User from LocalStorage
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user?._id;
 
@@ -17,9 +16,7 @@ const Cart = () => {
 
   const fetchUserOrders = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:5000/api/orders/user/${userId}`
-      );
+      const res = await userBaseUrl.get(`/orders/user/${userId}`);
       setOrders(res.data);
 
       const initialPayments = {};
@@ -49,12 +46,12 @@ const Cart = () => {
     const artworkId = order.a_id?._id || order.a_id;
 
     try {
-      await axios.put(`http://localhost:5000/api/orders/${order._id}`, {
+      await userBaseUrl.put(`/orders/${order._id}`, {
         orderStatus: "cancelled",
       });
 
       if (artworkId) {
-        await axios.patch(`http://localhost:5000/api/artworks/${artworkId}`, {
+        await userBaseUrl.patch(`/artworks/${artworkId}`, {
           isSold: false,
         });
       }
@@ -83,28 +80,24 @@ const Cart = () => {
   ) => {
     try {
       if (paymentMethods[orderId] == "ONLINE") {
-        const { data: keyData } = await axios.get(
-          `http://localhost:5000/api/v1/getkey`
-        );
+        const { data: keyData } = await userBaseUrl.get(`/v1/getkey`);
         const { key } = keyData;
         console.log(key);
 
-        const { data: orderData } = await axios.post(
-          `http://localhost:5000/api/v1/payment/process`,
-          {
-            amount,
-          }
+        const { data: orderData } = await userBaseUrl.post(
+          `/v1/payment/process`,
+          { amount }
         );
         const { order } = orderData;
         console.log(order);
 
         const options = {
-          key: key, // Replace with your Razorpay key_id
-          amount: amount, // Amount is in currency subunits.
+          key: key,
+          amount: amount,
           currency: "INR",
           name: fname + " " + lname,
           description: "Test Transaction",
-          order_id: order.id, // This is the order_id created in the backend
+          order_id: order.id,
           callback_url: `http://localhost:5000/api/v1/paymentVerification?orderId=${orderId}`,
           prefill: {
             name: fname + " " + lname,
@@ -119,14 +112,13 @@ const Cart = () => {
         const rzp = new Razorpay(options);
         rzp.open();
       } else {
-        await axios.put(`http://localhost:5000/api/orders/${orderId}`, {
+        await userBaseUrl.put(`/orders/${orderId}`, {
           paymentMethod: paymentMethods[orderId],
           orderStatus: "placed",
         });
         alert("Your order has been placed successfully!");
         window.location.reload();
       }
-
     } catch (err) {
       console.error("Update failed:", err);
       alert("Failed to confirm order. Please try again.");

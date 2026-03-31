@@ -1,55 +1,81 @@
 const User = require("../models/user.model");
 const Artwork = require("../models/artwork.model");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 
-exports.loginUser = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
-
-    if (!user || user.password !== password) {
-      return res.status(400).json({ message: "Invalid email or password" });
-    }
-
-    res.json({
-      message: "Login successful",
-      user: user
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
+const JWT_SECRET = process.env.JWT_SECRET;
 
 exports.registerUser = async (req, res) => {
   try {
     const { role, firstName, lastName, email, phone, address, password } = req.body;
 
     const existingEmail = await User.findOne({ email });
-    if (existingEmail) {
-      return res.status(400).json({ message: "Email already exists" });
-    }
+    if (existingEmail) return res.status(400).json({ message: "Email already exists" });
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     const user = await User.create({
-      role,
-      firstName,
-      lastName,
-      email,
-      phone,
-      address,
-      password
+      role, firstName, lastName, email, phone, address,
+      password: hashedPassword
     });
 
-    res.status(201).json({ message: "Registration successful", user });
-
+    res.status(201).json({ message: "Registration successful" });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
+exports.loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) return res.status(400).json({ message: "Invalid email or password" });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ message: "Invalid email or password" });
+
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    const userResponse = user.toObject();
+    delete userResponse.password;
+
+    res.json({
+      message: "Login successful",
+      token,
+      user: userResponse
+    });
+    
+  } catch (error) {
+    console.error("LOGIN ERROR:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+exports.getMe = async (req, res) => {
+  try {
+    // req.user.id comes from the verifyToken middleware
+    const user = await User.findById(req.user.id).select("-password");
+    
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
 
 exports.getUsers = async (req, res) => {
   try {
     const users = await User.find();
     res.json(users);
-    console.log(users)
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
@@ -62,7 +88,8 @@ exports.updateUser = async (req, res) => {
     const updateData = { firstName, lastName, phone, address, email };
 
     if (password && password.trim() !== "") {
-      updateData.password = password;
+      const salt = await bcrypt.genSalt(10);
+      updateData.password = await bcrypt.hash(password, salt);
     }
 
     const updatedUser = await User.findByIdAndUpdate(
