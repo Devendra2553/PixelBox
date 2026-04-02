@@ -12,7 +12,6 @@ const AdminOrders = () => {
   const fetchAllOrders = async () => {
     try {
       setLoading(true);
-      // Fetches all orders from the platform (Requires the GET /orders route on backend)
       const res = await userBaseUrl.get("/orders");
       setOrders(res.data);
     } catch (err) {
@@ -27,7 +26,12 @@ const AdminOrders = () => {
   }, []);
 
   const handleDelete = async (orderId) => {
-    if (!window.confirm("Are you sure? This will permanently delete the order record.")) return;
+    if (
+      !window.confirm(
+        "Are you sure? This will permanently delete the order record."
+      )
+    )
+      return;
     try {
       await userBaseUrl.delete(`/orders/${orderId}`);
       setOrders(orders.filter((order) => order._id !== orderId));
@@ -69,6 +73,22 @@ const AdminOrders = () => {
     return true;
   });
 
+  const formatCustomDate = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+
+    const pad = (num) => num.toString().padStart(2, "0");
+
+    const ss = pad(date.getSeconds());
+    const min = pad(date.getMinutes());
+    const hh = pad(date.getHours());
+    const dd = pad(date.getDate());
+    const mm = pad(date.getMonth() + 1);
+    const yyyy = date.getFullYear();
+
+    return `${ss}:${min}:${hh} ${dd}/${mm}/${yyyy}`;
+  };
+
   if (loading)
     return <div className="p-6 text-center">Loading platform orders...</div>;
 
@@ -91,7 +111,7 @@ const AdminOrders = () => {
             onClick={() => setFilter(type)}
             className={`px-5 py-2 rounded-xl capitalize transition font-medium whitespace-nowrap ${
               filter === type
-                ? "bg-black text-white shadow-md"
+                ? "bg-black text-white"
                 : "bg-gray-200 text-gray-600 hover:bg-gray-300"
             }`}
           >
@@ -147,6 +167,9 @@ const AdminOrders = () => {
                       : "bg-gray-200 cursor-pointer hover:border-b-2 border-gray-400"
                   }`}
                 >
+                  <option className="bg-white text-black" value="pending">
+                    Pending
+                  </option>
                   <option className="bg-white text-black" value="placed">
                     Placed
                   </option>
@@ -211,6 +234,20 @@ const AdminOrders = () => {
                 >
                   Payment: {order.paymentStatus}
                 </p>
+                <div className="mt-2 pt-2 border-t border-gray-50 space-y-1">
+                  <p className="text-[11px] text-gray-500">
+                    <span className="font-bold text-gray-400 uppercase">
+                      Created:
+                    </span>{" "}
+                    {formatCustomDate(order.createdAt)}
+                  </p>
+                  <p className="text-[11px] text-gray-500">
+                    <span className="font-bold text-gray-400 uppercase">
+                      Updated:
+                    </span>{" "}
+                    {formatCustomDate(order.updatedAt)}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -219,7 +256,8 @@ const AdminOrders = () => {
         {filteredOrders.length === 0 && (
           <div className="text-center py-20 bg-white rounded-3xl border-2 border-dashed">
             <p className="text-gray-400 font-medium">
-              No {filter !== "all" ? filter : ""} orders currently on the platform.
+              No {filter !== "all" ? filter : ""} orders currently on the
+              platform.
             </p>
           </div>
         )}

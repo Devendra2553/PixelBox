@@ -14,12 +14,10 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Public routes
 router.get("/", artworkController.getArtworks);
 router.get("/:id", artworkController.getArtworkById);
 router.get("/artist/:artistId", artworkController.getArtworksByArtist);
 
-// Protect routes
 router.post("/", verifyToken, upload.single("image"), artworkController.createArtwork); 
 router.patch("/:id", verifyToken, artworkController.updateArtwork);
 router.delete("/:id", verifyToken, artworkController.deleteArtwork);

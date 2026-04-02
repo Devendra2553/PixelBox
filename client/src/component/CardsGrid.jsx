@@ -95,8 +95,7 @@ const CardGrid = () => {
     }
   };
 
-  if (loading)
-    return <div className="text-center py-20">Loading Artworks...</div>;
+  if (loading) return <div className="text-center py-20">Loading Artworks...</div>;
 
   return (
     <div className="w-full md:w-5xl mx-auto px-6 py-10">

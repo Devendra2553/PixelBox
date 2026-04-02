@@ -27,7 +27,6 @@ const Order = () => {
   }, []);
 
   const filteredOrders = orders.filter((order) => {
-    if (order.orderStatus === "pending") return false;
 
     if (filter === "delivered") return order.orderStatus === "delivered";
     if (filter === "cancelled") return order.orderStatus === "cancelled";
@@ -120,7 +119,8 @@ const Order = () => {
                       }
                       disabled={
                         order.orderStatus === "delivered" ||
-                        order.orderStatus === "cancelled"
+                        order.orderStatus === "cancelled" ||
+                        order.orderStatus === "pending"
                       }
                       className={`p-2 rounded-lg outline-none font-semibold transition mr-1 
                         ${
@@ -128,9 +128,12 @@ const Order = () => {
                             ? "bg-green-200 text-green-800 cursor-not-allowed"
                             : order.orderStatus === "cancelled"
                             ? "bg-red-200 text-red-800 cursor-not-allowed"
+                            : order.orderStatus === "pending"
+                            ? "bg-gray-200 cursor-not-allowed"
                             : "bg-gray-200 cursor-pointer hover:border-b-2 border-gray-400"
                         }`}
                     >
+                      <option disabled value="pending">Pending</option>
                       <option value="placed">Placed</option>
                       <option value="shipped">Shipped</option>
                       <option value="delivered">Delivered</option>

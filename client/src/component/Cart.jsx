@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "./Navbar";
 import userBaseUrl from "../axioInstance";
-import { User, Edit2, X, Check } from "lucide-react";
+import { Edit2, X } from "lucide-react";
 
 const Cart = () => {
   const [orders, setOrders] = useState([]);
   const [paymentMethods, setPaymentMethods] = useState({});
   const [filter, setFilter] = useState("all");
 
-  // --- Profile Edit State ---
   const [currentUser, setCurrentUser] = useState(
     JSON.parse(localStorage.getItem("user"))
   );
+
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({
     firstName: currentUser?.firstName || "",
@@ -144,11 +144,25 @@ const Cart = () => {
     }
   };
 
+  const formatCustomDate = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+
+    const pad = (num) => num.toString().padStart(2, "0");
+
+    const ss = pad(date.getSeconds());
+    const min = pad(date.getMinutes());
+    const hh = pad(date.getHours());
+    const dd = pad(date.getDate());
+    const mm = pad(date.getMonth() + 1);
+    const yyyy = date.getFullYear();
+
+    return `${ss}:${min}:${hh} ${dd}/${mm}/${yyyy}`;
+  };
+
   const statusColor = (status) => {
     switch (status) {
       case "placed":
-        return "bg-gray-300 text-black";
-      case "pending":
         return "bg-yellow-100 text-yellow-600";
       case "shipped":
         return "bg-blue-100 text-blue-600";
@@ -162,17 +176,16 @@ const Cart = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 pb-10">
       <Navbar />
       <div className="pt-20">
         <div className="max-w-5xl mx-auto space-y-6">
-
           {/* --- PROFILE SECTION --- */}
-          <div className="bg-white rounded-2xl shadow-md p-6 border-b-4 border-[#ff751f] mx-3">
+          <div className="bg-white rounded-2xl shadow-md p-6 border-b-4 border-[#ff751f] mx-5">
             <div className="flex justify-between items-center mb-4">
               <div>
                 <h2 className="text-xl font-bold text-gray-800">
-                  Profile Edit
+                  Your Information
                 </h2>
               </div>
               <button
@@ -185,7 +198,7 @@ const Cart = () => {
                   </>
                 ) : (
                   <>
-                    <Edit2 size={16} /> Edit Profile
+                    <Edit2 size={16} /> Edit
                   </>
                 )}
               </button>
@@ -268,8 +281,12 @@ const Cart = () => {
                     <p className="text-[10px] uppercase font-black text-gray-400">
                       Contact
                     </p>
-                    <p className="font-semibold text-sm">{currentUser?.email}</p>
-                    <p className="text-gray-800 text-sm">+91 {currentUser?.phone}</p>
+                    <p className="font-semibold text-sm">
+                      {currentUser?.email}
+                    </p>
+                    <p className="text-gray-800 text-sm">
+                      +91 {currentUser?.phone}
+                    </p>
                   </div>
                   <div className="md:col-span-1">
                     <p className="text-[10px] uppercase font-black text-gray-400">
@@ -285,7 +302,7 @@ const Cart = () => {
           </div>
 
           {/* --- CART SECTION --- */}
-          <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-md p-6">
+          <div className="max-w-5xl mx-5 bg-white rounded-2xl shadow-md p-6">
             <h1 className="text-2xl font-semibold mb-6">Your Cart</h1>
             {sortedOrders.filter((order) => order.orderStatus === "pending")
               .length === 0 ? (
@@ -323,7 +340,6 @@ const Cart = () => {
 
                       {/* Middle Section: Payment & Delivery */}
                       <div className="flex flex-col gap-4">
-                        {/* Payment Toggle */}
                         <div>
                           <p className="text-xs font-bold text-gray-500 uppercase tracking-tight mb-1">
                             Payment Method
@@ -352,7 +368,6 @@ const Cart = () => {
                           </div>
                         </div>
 
-                        {/* Fixed Width Delivery Info (Visible only for non-mobile widths) */}
                         <div className="pt-3 border-t border-gray-300 md:w-64 lg:w-72">
                           <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
                             Delivery Information
@@ -408,9 +423,13 @@ const Cart = () => {
                   onChange={(e) => setFilter(e.target.value)}
                 >
                   {["all", "placed", "shipped", "delivered", "cancelled"].map(
-                    (f) => (
-                      <option key={f} className="bg-white text-black" value={f}>
-                        {f.charAt(0).toUpperCase() + f.slice(1)}
+                    (filtered) => (
+                      <option
+                        key={filtered}
+                        className="bg-white text-black"
+                        value={filtered}
+                      >
+                        {filtered.charAt(0).toUpperCase() + filtered.slice(1)}
                       </option>
                     )
                   )}
@@ -421,7 +440,7 @@ const Cart = () => {
                   You haven't placed any orders yet.
                 </p>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-4 capitalize">
                   {visibleOrders.map((order) => (
                     <div
                       key={order._id}
@@ -434,7 +453,7 @@ const Cart = () => {
                           className="w-16 h-16 rounded-lg object-cover bg-gray-200"
                         />
                         <div>
-                          <h2 className="font-semibold">{order.title}</h2>
+                          <h2 className="font-semibold">{order.title} by {order.artistName}</h2>
                           <p className="text-[#ff751f] text-sm font-semibold">
                             ₹{order.price}
                           </p>
@@ -462,6 +481,20 @@ const Cart = () => {
                               Cancel
                             </button>
                           )}
+                        <div className="mt-2 pt-2 border-t border-gray-50 space-y-1">
+                          <p className="text-[11px] text-gray-500">
+                            <span className="font-bold text-gray-400 uppercase">
+                              Created:
+                            </span>{" "}
+                            {formatCustomDate(order.createdAt)}
+                          </p>
+                          <p className="text-[11px] text-gray-500">
+                            <span className="font-bold text-gray-400 uppercase">
+                              Updated:
+                            </span>{" "}
+                            {formatCustomDate(order.updatedAt)}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   ))}
