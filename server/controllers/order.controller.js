@@ -30,6 +30,7 @@ exports.createOrder = async (req, res) => {
       paymentStatus: "unpaid"
     });
 
+    await Artwork.findByIdAndUpdate(a_id, { isSold: true })
     await order.save();
 
     res.status(201).json(order);
@@ -174,7 +175,7 @@ exports.paymentVerification = async (req, res) => {
   const isAuthentic = expected_signature === razorpay_signature;
 
   if (isAuthentic) {
-    return res.redirect(`http://localhost:5173/paymentSuccess?reference=${razorpay_payment_id}&orderId=${orderId}`);
+    return res.redirect(`${process.env.FRONTEND_URL}/paymentSuccess?reference=${razorpay_payment_id}&orderId=${orderId}`);
   } else {
     res.status(404).json({
       success: false

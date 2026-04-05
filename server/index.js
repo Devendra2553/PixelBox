@@ -1,4 +1,4 @@
-require("dotenv").config({ path: "config/config.env" });
+require("dotenv").config();
 
 const requiredEnvVars = ["JWT_SECRET", "MONGO_URI", "CLOUDINARY_CLOUD_NAME", "CLOUDINARY_API_KEY", "CLOUDINARY_API_SECRET"];
 requiredEnvVars.forEach((key) => {

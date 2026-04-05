@@ -19,7 +19,7 @@ const AddArtwork = ({ onUploadSuccess }) => {
     }
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [e.target.name]: validatedValue,
     });
   };
 

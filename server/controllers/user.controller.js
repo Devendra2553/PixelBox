@@ -3,8 +3,6 @@ const Artwork = require("../models/artwork.model");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
-const JWT_SECRET = process.env.JWT_SECRET;
-
 exports.registerUser = async (req, res) => {
   try {
     const { role, firstName, lastName, email, phone, address, password } = req.body;

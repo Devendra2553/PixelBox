@@ -74,7 +74,7 @@ const CardGrid = () => {
         return;
       }
 
-      await userBaseUrl.patch(`/artworks/${artworkId}`, { isSold: true });
+      // await userBaseUrl.patch(`/artworks/${artworkId}`, { isSold: true });
 
       await userBaseUrl.post("/orders", {
         u_id: user._id,
