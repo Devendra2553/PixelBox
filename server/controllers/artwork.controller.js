@@ -1,6 +1,5 @@
-const Artwork = require('../models/artwork.model')
-const fs = require("fs");
-const path = require("path");
+const Artwork = require('../models/artwork.model');
+const { cloudinary } = require("../config/cloudinary");
 
 exports.createArtwork = async (req, res) => {
   try {
@@ -9,13 +8,14 @@ exports.createArtwork = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ message: "Image is required" });
     }
+
     const artwork = await Artwork.create({
       u_id,
       artistName, 
       title,
       category,
       price: Number(price),
-      imageUrl: req.file.path.replace(/\\/g, "/") 
+      imageUrl: req.file.path 
     });
 
     res.status(201).json(artwork);
@@ -64,14 +64,18 @@ exports.deleteArtwork = async (req, res) => {
     const artwork = await Artwork.findById(req.params.id);
     if (!artwork) return res.status(404).json({ message: "Artwork not found" });
 
-    const filePath = path.join(__dirname, "..", artwork.imageUrl);
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
+    // Extract public_id from Cloudinary URL to delete it from the cloud
+    // This logic gets 'pixelbox_uploads/filename' from the URL
+    const publicId = artwork.imageUrl.split('/').slice(-2).join('/').split('.')[0];
+    
+    await cloudinary.uploader.destroy(publicId);
 
+    // Delete the document from MongoDB
     await Artwork.findByIdAndDelete(req.params.id);
-    res.status(200).json({ message: "Artwork deleted successfully" });
+    
+    res.status(200).json({ message: "Artwork and cloud image deleted successfully" });
   } catch (error) {
+    console.error("Delete Error:", error);
     res.status(500).json({ message: "Error deleting artwork", error: error.message });
   }
 };

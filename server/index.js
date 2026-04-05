@@ -1,8 +1,15 @@
+require("dotenv").config({ path: "config/config.env" });
+
+const requiredEnvVars = ["JWT_SECRET", "MONGO_URI", "CLOUDINARY_CLOUD_NAME", "CLOUDINARY_API_KEY", "CLOUDINARY_API_SECRET"];
+requiredEnvVars.forEach((key) => {
+  if (!process.env[key]) {
+    throw new Error(`Missing required environment variable: ${key}`);
+  }
+});
+
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const dotenv = require("dotenv");
-dotenv.config({ path: "config/config.env" });
 
 const userRoutes = require("./routes/user.routes.js");
 const artworkRoutes = require("./routes/artwork.routes.js");

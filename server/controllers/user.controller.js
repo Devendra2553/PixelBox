@@ -20,6 +20,8 @@ exports.registerUser = async (req, res) => {
       password: hashedPassword
     });
 
+    // console.log(user);
+
     res.status(201).json({ message: "Registration successful" });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
@@ -38,7 +40,7 @@ exports.loginUser = async (req, res) => {
 
     const token = jwt.sign(
       { id: user._id, role: user.role },
-      JWT_SECRET,
+      process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 
@@ -50,7 +52,7 @@ exports.loginUser = async (req, res) => {
       token,
       user: userResponse
     });
-    
+
   } catch (error) {
     console.error("LOGIN ERROR:", error);
     res.status(500).json({ message: "Server error", error: error.message });
@@ -59,13 +61,12 @@ exports.loginUser = async (req, res) => {
 
 exports.getMe = async (req, res) => {
   try {
-    // req.user.id comes from the verifyToken middleware
     const user = await User.findById(req.user.id).select("-password");
-    
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    
+
     res.json(user);
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });

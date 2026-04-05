@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const connetdb = async() => {
     try {
-        await mongoose.connect("mongodb://127.0.0.1:27017/artdb");
+        await mongoose.connect("mongodb+srv://dchauhan2553_db_user:QXt02PpveOEcqsxt@pixelboxcluster.hbtrxzx.mongodb.net/artdb?appName=PixelBoxCluster");
     } catch (error) {
         console.error("Database connection error:", error);
     }
