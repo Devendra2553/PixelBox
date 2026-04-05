@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const userBaseUrl = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api"
+    baseURL: "https://pixelbox-ubua.onrender.com/api"
 });
 
 userBaseUrl.interceptors.request.use(
