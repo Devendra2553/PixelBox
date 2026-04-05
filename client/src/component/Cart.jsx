@@ -12,6 +12,8 @@ const Cart = () => {
     JSON.parse(localStorage.getItem("user"))
   );
 
+  const storedUser = localStorage.getItem("user");
+
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({
     firstName: currentUser?.firstName || "",
@@ -181,7 +183,8 @@ const Cart = () => {
       <div className="pt-20">
         <div className="max-w-5xl mx-auto space-y-6">
           {/* --- PROFILE SECTION --- */}
-          <div className="bg-white rounded-2xl shadow-md p-6 border-b-4 border-[#ff751f] mx-5">
+          {storedUser && (
+          <div className="  bg-white rounded-2xl shadow-md p-6 border-b-4 border-[#ff751f] mx-5">
             <div className="flex justify-between items-center mb-4">
               <div>
                 <h2 className="text-xl font-bold text-gray-800">
@@ -300,6 +303,7 @@ const Cart = () => {
               </div>
             )}
           </div>
+          )}
 
           {/* --- CART SECTION --- */}
           <div className="max-w-5xl mx-5 bg-white rounded-2xl shadow-md p-6">
