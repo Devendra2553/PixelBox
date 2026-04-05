@@ -7,8 +7,6 @@ const AdminOrders = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
 
-  const API_BASE_URL = "http://localhost:5000/";
-
   const fetchAllOrders = async () => {
     try {
       setLoading(true);
@@ -130,8 +128,8 @@ const AdminOrders = () => {
               {/* Artwork Info */}
               <div className="flex items-center gap-4">
                 <img
-                  src={`${API_BASE_URL}${order.a_id?.imageUrl}`}
-                  alt={order.title}
+                  src={item.imageUrl}
+                  alt={item.title}
                   className="w-20 h-20 object-cover rounded-2xl border"
                 />
                 <div>

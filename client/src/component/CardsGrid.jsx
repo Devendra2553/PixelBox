@@ -11,8 +11,6 @@ const CardGrid = () => {
   const [selectedCategory, setSelectedCategory] = useState("Category");
   const [selectedArtist, setSelectedArtist] = useState("Artist");
 
-  const API_BASE_URL = "http://localhost:5000/";
-
   useEffect(() => {
     const fetchArtworks = async () => {
       try {
@@ -95,7 +93,8 @@ const CardGrid = () => {
     }
   };
 
-  if (loading) return <div className="text-center py-20">Loading Artworks...</div>;
+  if (loading)
+    return <div className="text-center py-20">Loading Artworks...</div>;
 
   return (
     <div className="w-full md:w-5xl mx-auto px-6 py-10">
@@ -198,7 +197,7 @@ const CardGrid = () => {
             >
               <div className="relative w-full aspect-4/5 overflow-hidden">
                 <img
-                  src={`${API_BASE_URL}${item.imageUrl}`}
+                  src={item.imageUrl}
                   alt={item.title}
                   className="w-full h-full object-cover"
                 />
@@ -210,7 +209,9 @@ const CardGrid = () => {
               </div>
 
               <div className="flex flex-col grow p-4 space-y-1">
-                <h3 className="font-semibold capitalize text-lg">{item.title}</h3>
+                <h3 className="font-semibold capitalize text-lg">
+                  {item.title}
+                </h3>
                 <h5 className="font-md capitalize text-sm">{item.category}</h5>
                 <h5 className="text-md capitalize text-gray-500">
                   {item?.artistName || "Unknown Artist"}

@@ -10,8 +10,6 @@ const Artwork = () => {
   const user = JSON.parse(localStorage.getItem("user"));
   const artistId = user?._id;
 
-  const API_BASE_URL = "http://localhost:5000/";
-
   useEffect(() => {
     const fetchArtworks = async () => {
       try {
@@ -83,7 +81,7 @@ const Artwork = () => {
             >
               <div className="relative w-full aspect-4/5 overflow-hidden">
                 <img
-                  src={`${API_BASE_URL}${item.imageUrl}`}
+                  src={item.imageUrl}
                   alt={item.title}
                   className="w-full h-full object-cover"
                 />

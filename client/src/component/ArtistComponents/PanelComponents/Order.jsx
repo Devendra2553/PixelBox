@@ -27,7 +27,6 @@ const Order = () => {
   }, []);
 
   const filteredOrders = orders.filter((order) => {
-
     if (filter === "delivered") return order.orderStatus === "delivered";
     if (filter === "cancelled") return order.orderStatus === "cancelled";
 
@@ -46,10 +45,7 @@ const Order = () => {
         orderStatus: newStatus,
         ...(isDelivered && { paymentStatus: "paid" }),
       };
-      await userBaseUrl.put(
-        `http://localhost:5000/api/orders/${orderId}`,
-        updateData
-      );
+      await userBaseUrl.put(`/orders/${orderId}`, updateData);
 
       setOrders(
         orders.map((order) =>
@@ -95,8 +91,8 @@ const Order = () => {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div className="flex items-center gap-4">
                 <img
-                  src={`http://localhost:5000/${order.a_id?.imageUrl}`}
-                  alt={order.title}
+                  src={item.imageUrl}
+                  alt={item.title}
                   className="w-16 h-16 object-cover rounded-xl"
                 />
                 <div>
@@ -133,7 +129,9 @@ const Order = () => {
                             : "bg-gray-200 cursor-pointer hover:border-b-2 border-gray-400"
                         }`}
                     >
-                      <option disabled value="pending">Pending</option>
+                      <option disabled value="pending">
+                        Pending
+                      </option>
                       <option value="placed">Placed</option>
                       <option value="shipped">Shipped</option>
                       <option value="delivered">Delivered</option>

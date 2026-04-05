@@ -127,7 +127,7 @@ const Cart = () => {
           currency: "INR",
           name: `${fname} ${lname}`,
           order_id: orderData.order.id,
-          callback_url: `http://localhost:5000/api/v1/paymentVerification?orderId=${orderId}`,
+          callback_url: `${userBaseUrl}/v1/paymentVerification?orderId=${orderId}`,
           prefill: { name: `${fname} ${lname}`, email, contact: phone },
           theme: { color: "#F37254" },
         };
@@ -184,125 +184,125 @@ const Cart = () => {
         <div className="max-w-5xl mx-auto space-y-6">
           {/* --- PROFILE SECTION --- */}
           {storedUser && (
-          <div className="  bg-white rounded-2xl shadow-md p-6 border-b-4 border-[#ff751f] mx-5">
-            <div className="flex justify-between items-center mb-4">
-              <div>
-                <h2 className="text-xl font-bold text-gray-800">
-                  Your Information
-                </h2>
-              </div>
-              <button
-                onClick={() => setIsEditingProfile(!isEditingProfile)}
-                className="flex items-center gap-2 text-sm font-bold text-[#ff751f] hover:underline"
-              >
-                {isEditingProfile ? (
-                  <>
-                    <X size={16} /> Cancel
-                  </>
-                ) : (
-                  <>
-                    <Edit2 size={16} /> Edit
-                  </>
-                )}
-              </button>
-            </div>
-
-            {isEditingProfile ? (
-              <form
-                onSubmit={handleProfileUpdate}
-                className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 animate-in fade-in duration-300"
-              >
-                <input
-                  name="firstName"
-                  value={profileForm.firstName}
-                  onChange={handleProfileChange}
-                  className="border p-2.5 rounded-xl outline-none focus:ring-2 ring-orange-200"
-                  placeholder="First Name"
-                  required
-                />
-                <input
-                  name="lastName"
-                  value={profileForm.lastName}
-                  onChange={handleProfileChange}
-                  className="border p-2.5 rounded-xl outline-none focus:ring-2 ring-orange-200"
-                  placeholder="Last Name"
-                  required
-                />
-                <input
-                  name="email"
-                  type="email"
-                  value={profileForm.email}
-                  onChange={handleProfileChange}
-                  className="border p-2.5 rounded-xl outline-none focus:ring-2 ring-orange-200"
-                  placeholder="Email"
-                  required
-                />
-                <input
-                  name="phone"
-                  value={profileForm.phone}
-                  onChange={handleProfileChange}
-                  className="border p-2.5 rounded-xl outline-none focus:ring-2 ring-orange-200"
-                  placeholder="Phone"
-                  required
-                />
-                <textarea
-                  name="address"
-                  value={profileForm.address}
-                  onChange={handleProfileChange}
-                  className="border p-2.5 rounded-xl md:col-span-2 outline-none focus:ring-2 ring-orange-200"
-                  placeholder="Delivery Address"
-                  rows="2"
-                  required
-                />
-                <input
-                  name="password"
-                  type="password"
-                  value={profileForm.password}
-                  onChange={handleProfileChange}
-                  className="border p-2.5 rounded-xl md:col-span-2 outline-none focus:ring-2 ring-orange-200"
-                  placeholder="New Password (leave blank to keep current)"
-                />
+            <div className="  bg-white rounded-2xl shadow-md p-6 border-b-4 border-[#ff751f] mx-5">
+              <div className="flex justify-between items-center mb-4">
+                <div>
+                  <h2 className="text-xl font-bold text-gray-800">
+                    Your Information
+                  </h2>
+                </div>
                 <button
-                  type="submit"
-                  className="md:col-span-2 bg-[#ff751f] text-white py-3 rounded-xl font-bold shadow-md hover:bg-[#e66412] transition"
+                  onClick={() => setIsEditingProfile(!isEditingProfile)}
+                  className="flex items-center gap-2 text-sm font-bold text-[#ff751f] hover:underline"
                 >
-                  Save Changes
+                  {isEditingProfile ? (
+                    <>
+                      <X size={16} /> Cancel
+                    </>
+                  ) : (
+                    <>
+                      <Edit2 size={16} /> Edit
+                    </>
+                  )}
                 </button>
-              </form>
-            ) : (
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-2">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div>
-                    <p className="text-[10px] uppercase font-black text-gray-400">
-                      Name
-                    </p>
-                    <p className="font-semibold text-sm capitalize">
-                      {currentUser?.firstName} {currentUser?.lastName}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] uppercase font-black text-gray-400">
-                      Contact
-                    </p>
-                    <p className="font-semibold text-sm">
-                      {currentUser?.email}
-                    </p>
-                    <p className="text-gray-800 text-sm">
-                      +91 {currentUser?.phone}
-                    </p>
-                  </div>
-                  <div className="md:col-span-1">
-                    <p className="text-[10px] uppercase font-black text-gray-400">
-                      Default Address
-                    </p>
-                    <p className="text-gray-800 text-sm italic capitalize leading-snug">
-                      {currentUser?.address || "No address set"}
-                    </p>
+              </div>
+
+              {isEditingProfile ? (
+                <form
+                  onSubmit={handleProfileUpdate}
+                  className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 animate-in fade-in duration-300"
+                >
+                  <input
+                    name="firstName"
+                    value={profileForm.firstName}
+                    onChange={handleProfileChange}
+                    className="border p-2.5 rounded-xl outline-none focus:ring-2 ring-orange-200"
+                    placeholder="First Name"
+                    required
+                  />
+                  <input
+                    name="lastName"
+                    value={profileForm.lastName}
+                    onChange={handleProfileChange}
+                    className="border p-2.5 rounded-xl outline-none focus:ring-2 ring-orange-200"
+                    placeholder="Last Name"
+                    required
+                  />
+                  <input
+                    name="email"
+                    type="email"
+                    value={profileForm.email}
+                    onChange={handleProfileChange}
+                    className="border p-2.5 rounded-xl outline-none focus:ring-2 ring-orange-200"
+                    placeholder="Email"
+                    required
+                  />
+                  <input
+                    name="phone"
+                    value={profileForm.phone}
+                    onChange={handleProfileChange}
+                    className="border p-2.5 rounded-xl outline-none focus:ring-2 ring-orange-200"
+                    placeholder="Phone"
+                    required
+                  />
+                  <textarea
+                    name="address"
+                    value={profileForm.address}
+                    onChange={handleProfileChange}
+                    className="border p-2.5 rounded-xl md:col-span-2 outline-none focus:ring-2 ring-orange-200"
+                    placeholder="Delivery Address"
+                    rows="2"
+                    required
+                  />
+                  <input
+                    name="password"
+                    type="password"
+                    value={profileForm.password}
+                    onChange={handleProfileChange}
+                    className="border p-2.5 rounded-xl md:col-span-2 outline-none focus:ring-2 ring-orange-200"
+                    placeholder="New Password (leave blank to keep current)"
+                  />
+                  <button
+                    type="submit"
+                    className="md:col-span-2 bg-[#ff751f] text-white py-3 rounded-xl font-bold shadow-md hover:bg-[#e66412] transition"
+                  >
+                    Save Changes
+                  </button>
+                </form>
+              ) : (
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-2">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                      <p className="text-[10px] uppercase font-black text-gray-400">
+                        Name
+                      </p>
+                      <p className="font-semibold text-sm capitalize">
+                        {currentUser?.firstName} {currentUser?.lastName}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] uppercase font-black text-gray-400">
+                        Contact
+                      </p>
+                      <p className="font-semibold text-sm">
+                        {currentUser?.email}
+                      </p>
+                      <p className="text-gray-800 text-sm">
+                        +91 {currentUser?.phone}
+                      </p>
+                    </div>
+                    <div className="md:col-span-1">
+                      <p className="text-[10px] uppercase font-black text-gray-400">
+                        Default Address
+                      </p>
+                      <p className="text-gray-800 text-sm italic capitalize leading-snug">
+                        {currentUser?.address || "No address set"}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
           )}
 
           {/* --- CART SECTION --- */}
@@ -328,7 +328,7 @@ const Cart = () => {
                       {/* Left Section: Artwork Info */}
                       <div className="flex gap-4 items-center">
                         <img
-                          src={`http://localhost:5000/${item.a_id?.imageUrl}`}
+                          src={item.imageUrl}
                           alt={item.title}
                           className="w-20 h-20 rounded-xl object-cover shadow-sm"
                         />
@@ -452,12 +452,14 @@ const Cart = () => {
                     >
                       <div className="flex gap-4 items-center">
                         <img
-                          src={`http://localhost:5000/${order.a_id?.imageUrl}`}
-                          alt={order.title}
+                          src={item.imageUrl}
+                          alt={item.title}
                           className="w-16 h-16 rounded-lg object-cover bg-gray-200"
                         />
                         <div>
-                          <h2 className="font-semibold">{order.title} by {order.artistName}</h2>
+                          <h2 className="font-semibold">
+                            {order.title} by {order.artistName}
+                          </h2>
                           <p className="text-[#ff751f] text-sm font-semibold">
                             ₹{order.price}
                           </p>

@@ -7,7 +7,6 @@ const AdminArtworks = () => {
   const [filter, setFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
 
-  const API_BASE_URL = "http://localhost:5000/";
   useEffect(() => {
     const fetchAllArtworks = async () => {
       try {
@@ -97,7 +96,7 @@ const AdminArtworks = () => {
             >
               <div className="relative w-full aspect-square overflow-hidden bg-gray-200">
                 <img
-                  src={`${API_BASE_URL}${item.imageUrl}`}
+                  src={item.imageUrl}
                   alt={item.title}
                   className="w-full h-full object-cover"
                 />
