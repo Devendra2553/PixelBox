@@ -6,7 +6,7 @@ import userBaseUrl from '../axioInstance';
 const PaymentSuccess = () => {
   const [searchQuery] = useSearchParams();
   const reference = searchQuery.get("reference");
-  const orderId = searchQuery.get("orderId"); 
+  const orderId = searchQuery.get("orderId");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

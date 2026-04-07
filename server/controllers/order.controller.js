@@ -174,14 +174,11 @@ exports.paymentVerification = async (req, res) => {
   const isAuthentic = expected_signature === razorpay_signature;
 
   if (isAuthentic) {
-    // Redirect and then immediately RETURN to stop execution
     return res.redirect(`https://pixel-box-git-main-devendra2553s-projects.vercel.app/paymentSuccess?reference=${razorpay_payment_id}&orderId=${orderId}`);
   } else {
-    // Return here as well if the payment fails
     return res.status(400).json({
       success: false,
       message: "Payment verification failed"
     });
   }
-  // Remove the extra res.status(200) that was down here!
 };
