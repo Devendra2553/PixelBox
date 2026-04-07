@@ -449,7 +449,7 @@ const Cart = () => {
                     <div key={order._id} className="...">
                       <div className="flex gap-4 items-center">
                         <img
-                          src={order.imageUrl}
+                          src={order.a_id?.imageUrl}
                           alt={order.title}
                           className="w-16 h-16 rounded-lg object-cover bg-gray-200"
                         />
