@@ -128,7 +128,7 @@ const AdminOrders = () => {
               {/* Artwork Info */}
               <div className="flex items-center gap-4">
                 <img
-                  src={order.imageUrl}
+                  src={order.a_id?.imageUrl}
                   alt={order.title}
                   className="w-20 h-20 object-cover rounded-2xl border"
                 />

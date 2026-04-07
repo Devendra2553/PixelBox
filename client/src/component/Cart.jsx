@@ -458,12 +458,8 @@ const Cart = () => {
                           className="w-16 h-16 rounded-xl object-cover bg-gray-100 border border-gray-100"
                         />
                         <div className="space-y-0.5">
-                          <h2 className="font-bold text-gray-800 text-sm md:text-base leading-tight">
-                            {order.title}{" "}
-                            <span className="text-gray-400 font-normal">
-                              by
-                            </span>{" "}
-                            {order.artistName}
+                          <h2 className="font-semibold text-gray-800 text-sm md:text-base leading-tight">
+                            {order.title} By {order.artistName}
                           </h2>
                           <p className="text-[#ff751f] text-sm font-black">
                             ₹{order.price}
