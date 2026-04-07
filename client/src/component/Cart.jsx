@@ -444,57 +444,66 @@ const Cart = () => {
                   You haven't placed any orders yet.
                 </p>
               ) : (
-                <div className="space-y-4 capitalize">
+                <div className="space-y-3 capitalize">
                   {visibleOrders.map((order) => (
-                    <div key={order._id} className="...">
+                    <div
+                      key={order._id}
+                      className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-4 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow gap-4"
+                    >
+                      {/* Left Side: Image and Info */}
                       <div className="flex gap-4 items-center">
                         <img
                           src={order.a_id?.imageUrl}
                           alt={order.title}
-                          className="w-16 h-16 rounded-lg object-cover bg-gray-200"
+                          className="w-16 h-16 rounded-xl object-cover bg-gray-100 border border-gray-100"
                         />
-                        <div>
-                          <h2 className="font-semibold">
-                            {order.title} by {order.artistName}
+                        <div className="space-y-0.5">
+                          <h2 className="font-bold text-gray-800 text-sm md:text-base leading-tight">
+                            {order.title}{" "}
+                            <span className="text-gray-400 font-normal">
+                              by
+                            </span>{" "}
+                            {order.artistName}
                           </h2>
-                          <p className="text-[#ff751f] text-sm font-semibold">
+                          <p className="text-[#ff751f] text-sm font-black">
                             ₹{order.price}
                           </p>
-                          <p className="text-[10px] uppercase tracking-widest text-gray-500">
-                            Method: {order.paymentMethod}
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                            {order.paymentMethod} Payment
                           </p>
                         </div>
                       </div>
-                      <div className="flex flex-col items-end gap-2">
-                        <span
-                          className={`px-4 py-1 text-[10px] rounded-full font-bold uppercase ${statusColor(
-                            order.orderStatus
-                          )}`}
-                        >
-                          {order.orderStatus}
-                        </span>
-                        {order.orderStatus !== "delivered" &&
-                          order.orderStatus !== "cancelled" && (
-                            <button
-                              onClick={() =>
-                                handleUpdateStatusToCancelled(order)
-                              }
-                              className="text-[10px] text-white bg-red-500 px-4 py-1 rounded-full font-bold uppercase"
-                            >
-                              Cancel
-                            </button>
-                          )}
-                        <div className="mt-2 pt-2 border-t border-gray-50 space-y-1">
-                          <p className="text-[11px] text-gray-500">
-                            <span className="font-bold text-gray-400 uppercase">
-                              Created:
-                            </span>{" "}
+
+                      {/* Right Side: Status and Dates */}
+                      <div className="flex flex-col items-end gap-2 w-full sm:w-auto border-t sm:border-t-0 pt-3 sm:pt-0">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`px-3 py-1 text-[10px] rounded-full font-black uppercase tracking-tighter ${statusColor(
+                              order.orderStatus
+                            )}`}
+                          >
+                            {order.orderStatus}
+                          </span>
+                          {order.orderStatus !== "delivered" &&
+                            order.orderStatus !== "cancelled" && (
+                              <button
+                                onClick={() =>
+                                  handleUpdateStatusToCancelled(order)
+                                }
+                                className="text-[10px] text-red-500 bg-red-50 px-3 py-1 rounded-full font-bold uppercase hover:bg-red-500 hover:text-white transition"
+                              >
+                                Cancel
+                              </button>
+                            )}
+                        </div>
+
+                        <div className="text-right">
+                          <p className="text-[9px] text-gray-400 leading-tight">
+                            <span className="font-black">PLACED:</span>{" "}
                             {formatCustomDate(order.createdAt)}
                           </p>
-                          <p className="text-[11px] text-gray-500">
-                            <span className="font-bold text-gray-400 uppercase">
-                              Updated:
-                            </span>{" "}
+                          <p className="text-[9px] text-gray-400 leading-tight">
+                            <span className="font-black">UPDATED:</span>{" "}
                             {formatCustomDate(order.updatedAt)}
                           </p>
                         </div>

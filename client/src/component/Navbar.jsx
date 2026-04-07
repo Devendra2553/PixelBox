@@ -18,16 +18,22 @@ const Navbar = () => {
         {isOpen && (
           <span className="absolute whitespace-nowrap flex flex-col top-8 left-0 font-medium">
             <Link
-              className="bg-[#fffffff0] text-[#ff751f] py-1 px-2 rounded shadow m-1 hover:bg-orange-200"
+              className="bg-[#fffffff0] text-[#ff751f] py-1 px-3 rounded shadow-2xs m-1 hover:shadow hover:translate-x-2 duration-100 ease-in-out"
+              to="/userlogin"
+            >
+              Login as customer
+            </Link>
+            <Link
+              className="bg-[#fffffff0] text-[#ff751f] py-1 px-3 rounded shadow-2xs m-1 hover:shadow hover:translate-x-2 duration-100 ease-in-out"
               to="/artistlogin"
             >
               Login as artist
             </Link>
             <Link
-              className="bg-[#fffffff0] text-[#ff751f] py-1 px-2 rounded shadow m-1 hover:bg-orange-200"
-              to="/userlogin"
+              className="bg-[#fffffff0] text-[#ff751f] py-1 px-3 rounded shadow-2xs m-1 hover:shadow hover:translate-x-2 duration-100 ease-in-out"
+              to="/adminlogin"
             >
-              Login as customer
+              Login as admin
             </Link>
           </span>
         )}
