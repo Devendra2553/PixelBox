@@ -446,14 +446,11 @@ const Cart = () => {
               ) : (
                 <div className="space-y-4 capitalize">
                   {visibleOrders.map((order) => (
-                    <div
-                      key={order._id}
-                      className="flex justify-between items-center bg-gray-100 p-4 rounded-xl shadow-sm"
-                    >
+                    <div key={order._id} className="...">
                       <div className="flex gap-4 items-center">
                         <img
-                          src={item.imageUrl}
-                          alt={item.title}
+                          src={order.imageUrl}
+                          alt={order.title}
                           className="w-16 h-16 rounded-lg object-cover bg-gray-200"
                         />
                         <div>
