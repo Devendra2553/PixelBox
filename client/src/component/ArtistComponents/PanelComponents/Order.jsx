@@ -65,12 +65,12 @@ const Order = () => {
       <h2 className="text-2xl font-semibold mb-6">Your Sales Orders</h2>
 
       {/* Filter Buttons */}
-      <div className="flex gap-3 mb-6">
+      <div className="flex gap-3 mb-6 overflow-x-auto pb-2 no-scrollbar">
         {["all", "pending", "delivered", "cancelled"].map((type) => (
           <button
             key={type}
             onClick={() => setFilter(type)}
-            className={`px-4 py-2 rounded-xl capitalize transition ${
+            className={`px-4 py-2 rounded-xl capitalize transition shrink-0 ${
               filter === type
                 ? "bg-gray-950 text-white"
                 : "bg-gray-200 hover:bg-gray-300"

@@ -328,7 +328,7 @@ const Cart = () => {
                       {/* Left Section: Artwork Info */}
                       <div className="flex gap-4 items-center">
                         <img
-                          src={item.imageUrl}
+                          src={item.a_id?.imageUrl}
                           alt={item.title}
                           className="w-20 h-20 rounded-xl object-cover shadow-sm"
                         />
