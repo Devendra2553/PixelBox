@@ -17,7 +17,7 @@ const ArtistPanel = () => {
     { to: "artwork", label: "Artwork", icon: Image },
     { to: "order", label: "Order", icon: ShoppingCart },
     { to: "profile", label: "Profile", icon: UserCog },
-    { to: "/artistlogin", label: "Log Out", icon: LogOut },
+    { to: "/", label: "Log Out", icon: LogOut },
   ];
 
   return (

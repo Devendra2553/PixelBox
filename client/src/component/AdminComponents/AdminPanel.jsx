@@ -17,7 +17,7 @@ const AdminPanel = () => {
     { to: "adminartworks", label: "Artworks", icon: Image },
     { to: "adminorders", label: "Orders", icon: ShoppingCart },
     { to: "adminusers", label: "Users", icon: UserCog },
-    { to: "/adminlogin", label: "Log Out", icon: LogOut },
+    { to: "/", label: "Log Out", icon: LogOut },
   ];
 
   return (
