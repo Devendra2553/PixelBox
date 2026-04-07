@@ -127,7 +127,7 @@ const Cart = () => {
           currency: "INR",
           name: `${fname} ${lname}`,
           order_id: orderData.order.id,
-          callback_url: `${userBaseUrl}/v1/paymentVerification?orderId=${orderId}`,
+          callback_url: `https://pixelbox-ubua.onrender.com/api/orders/paymentVerification?orderId=${orderId}`,
           prefill: { name: `${fname} ${lname}`, email, contact: phone },
           theme: { color: "#F37254" },
         };

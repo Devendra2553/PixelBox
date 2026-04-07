@@ -163,26 +163,25 @@ exports.getKey = async (req, res) => {
 }
 
 exports.paymentVerification = async (req, res) => {
-  const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body
+  const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
   const { orderId } = req.query;
 
   const body = razorpay_order_id + '|' + razorpay_payment_id;
-  const expected_signature = crypto.createHmac("sha256", process.env.RAZORPAY_SEC).update(body.toString()).digest("hex");
-
-  console.log(`EXPECTED_SIGNATURE: ${expected_signature}`)
-  console.log(`RAZORPAY_SIGNATURE: ${razorpay_signature}`)
+  const expected_signature = crypto.createHmac("sha256", process.env.RAZORPAY_SEC)
+    .update(body.toString())
+    .digest("hex");
 
   const isAuthentic = expected_signature === razorpay_signature;
 
   if (isAuthentic) {
-    return res.redirect(`${process.env.FRONTEND_URL}/paymentSuccess?reference=${razorpay_payment_id}&orderId=${orderId}`);
+    // Redirect and then immediately RETURN to stop execution
+    return res.redirect(`https://pixel-box-git-main-devendra2553s-projects.vercel.app/paymentSuccess?reference=${razorpay_payment_id}&orderId=${orderId}`);
   } else {
-    res.status(404).json({
-      success: false
-    })
+    // Return here as well if the payment fails
+    return res.status(400).json({
+      success: false,
+      message: "Payment verification failed"
+    });
   }
-
-  res.status(200).json({
-    success: true
-  })
-}
+  // Remove the extra res.status(200) that was down here!
+};
