@@ -1,13 +1,9 @@
 const express = require("express");
 const router = express.Router();
-// const multer = require("multer");
 const verifyToken = require("../middleware/auth");
 const artworkController = require("../controllers/artwork.controller");
 
-// const { storage } = require("../config/cloudinary"); 
-const { upload } = require("../config/cloudinary");
-
-const upload = multer({ storage });
+const { upload } = require("../config/cloudinary"); 
 
 router.get("/", artworkController.getArtworks);
 router.get("/:id", artworkController.getArtworkById);
