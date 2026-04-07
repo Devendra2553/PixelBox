@@ -5,8 +5,8 @@ exports.createArtwork = async (req, res) => {
   try {
     const { u_id, artistName, title, category, price } = req.body;
 
-    if (!req.file) {
-      return res.status(400).json({ message: "Image is required" });
+    if (!req.file || !req.file.path) {
+      return res.status(400).json({ message: "Image upload failed or image is missing" });
     }
 
     const artwork = await Artwork.create({
