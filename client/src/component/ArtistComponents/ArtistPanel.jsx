@@ -11,24 +11,13 @@ import {
 
 const ArtistPanel = () => {
   const [open, setOpen] = useState(false);
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-
-    // 2. Redirect the user to the login or home page[cite: 21]
-    alert("Logged out successfully");
-    navigate("/artistlogin"); 
-  };
 
   const navItems = [
     { to: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { to: "artwork", label: "Artwork", icon: Image },
     { to: "order", label: "Order", icon: ShoppingCart },
     { to: "profile", label: "Profile", icon: UserCog },
-    // Label it as a logout action instead of just a link[cite: 22]
-    { label: "Log Out", icon: LogOut, isLogout: true },
+    { to: "/", label: "Log Out", icon: LogOut },
   ];
 
   return (
