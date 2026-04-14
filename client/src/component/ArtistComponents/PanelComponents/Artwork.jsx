@@ -89,7 +89,7 @@ const Artwork = () => {
                 {!item.isSold && (
                   <button
                     onClick={() => handleDelete(item._id)}
-                    className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition shadow-lg"
+                    className="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-full shadow-lg"
                   >
                     <Trash2 size={18} />
                   </button>

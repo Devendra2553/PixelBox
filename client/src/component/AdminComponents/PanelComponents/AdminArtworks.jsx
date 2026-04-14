@@ -103,7 +103,7 @@ const AdminArtworks = () => {
 
                 <button
                   onClick={() => handleDelete(item._id)}
-                  className="absolute top-3 right-3 bg-red-600 text-white p-2.5 rounded-full opacity-0 group-hover:opacity-100 transition shadow-lg hover:bg-red-700"
+                  className="absolute top-3 right-3 bg-red-600 text-white p-2.5 rounded-full shadow-lg"
                 >
                   <Trash2 size={18} />
                 </button>
