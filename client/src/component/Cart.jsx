@@ -330,11 +330,12 @@ const Cart = () => {
                         <img
                           src={item.a_id?.imageUrl}
                           alt={item.title}
-                          className="w-20 h-20 rounded-xl object-cover shadow-sm"
+                          className="aspect-4/5 h-20 rounded-xl object-cover shadow-sm"
                         />
                         <div>
                           <h2 className="font-bold text-gray-800">
                             {item.title}
+                            <h3 className="font-normal text-gray-600">By {item.artistName} </h3>
                           </h2>
                           <p className="text-[#ff751f] font-black text-lg">
                             ₹{item.price}
@@ -455,7 +456,7 @@ const Cart = () => {
                         <img
                           src={order.a_id?.imageUrl}
                           alt={order.title}
-                          className="w-16 h-16 rounded-xl object-cover bg-gray-100 border border-gray-100"
+                          className="aspect-4/5 h-16 rounded-xl object-cover bg-gray-100 border border-gray-100"
                         />
                         <div className="space-y-0.5">
                           <h2 className="font-semibold text-gray-800 text-sm md:text-base leading-tight">

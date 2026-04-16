@@ -72,10 +72,14 @@ const AddArtwork = ({ onUploadSuccess }) => {
         className="grid md:grid-cols-2 gap-4 mb-3 p-5 rounded-2xl bg-white shadow-md"
       >
         {/* Artwork Preview Box */}
-        <div>
-          <div className="md:row-span-4 flex justify-center mb-2">
+        <div className="h-full">
+          {" "}
+          {/* Added h-full here */}
+          <div className="flex justify-center h-full">
+            {" "}
+            {/* Ensure inner div fills height */}
             {preview ? (
-              <div className="relative group w-full h-48 border-2 border-dashed border-[#ff751f] rounded-xl overflow-hidden">
+              <div className="relative group aspect-4/5 border-2 border-dashed border-[#ff751f] rounded-xl overflow-hidden w-full">
                 <img
                   src={preview}
                   alt="Artwork Preview"
@@ -87,20 +91,21 @@ const AddArtwork = ({ onUploadSuccess }) => {
                     setImage(null);
                     setPreview("");
                   }}
-                  className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full text-xs opacity-0 group-hover:opacity-100 transition"
+                  className="absolute top-2 right-2 bg-red-500 text-white p-1 px-2 rounded-full text-xs opacity-0 group-hover:opacity-100 transition"
                 >
                   ✕
                 </button>
               </div>
             ) : (
-              <div className="w-full h-48 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center text-gray-400">
+              <div className="w-full h-full border-2 aspect-4/5 border-dashed border-gray-300 rounded-xl flex items-center justify-center text-gray-400">
                 Artwork Preview
               </div>
             )}
           </div>
         </div>
 
-        <div className="flex flex-col gap-2">
+        {/* Right Side: Inputs and Button */}
+        <div className="flex flex-col gap-3">
           <input
             className="w-full border p-2 rounded-md border-[#ff751f] focus:outline-none focus:ring-2 focus:ring-[#ff751f]/30"
             name="title"
@@ -126,8 +131,6 @@ const AddArtwork = ({ onUploadSuccess }) => {
             placeholder="Price"
             required
           />
-
-          {/* Styled File Input */}
           <div className="w-full relative">
             <label className="cursor-pointer bg-white border font-bold border-[#ff751f] text-[#ff751f] py-2 px-4 rounded-md w-full block text-center hover:bg-[#ff751f] hover:text-white transition">
               {image ? "Change Image" : "Select Image"}
@@ -140,14 +143,14 @@ const AddArtwork = ({ onUploadSuccess }) => {
               />
             </label>
           </div>
-        </div>
 
-        <button
-          className="w-full md:col-span-2 mt-2 px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-[#e66412] transition font-semibold"
-          type="submit"
-        >
-          Upload Artwork
-        </button>
+          <button
+            className="w-full mt-auto px-6 py-5 bg-orange-500 text-white rounded-lg hover:bg-[#e66412] transition font-bold text-xl cursor-pointer"
+            type="submit"
+          >
+            Upload Artwork
+          </button>
+        </div>
       </form>
     </div>
   );

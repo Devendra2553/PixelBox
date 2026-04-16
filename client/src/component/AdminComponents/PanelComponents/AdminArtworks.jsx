@@ -94,7 +94,7 @@ const AdminArtworks = () => {
               key={item._id}
               className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col hover:shadow-md transition group border border-gray-200"
             >
-              <div className="relative w-full aspect-square overflow-hidden bg-gray-200">
+              <div className="relative w-full aspect-4/5 overflow-hidden bg-gray-200">
                 <img
                   src={item.imageUrl}
                   alt={item.title}
